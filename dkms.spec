@@ -57,24 +57,14 @@ as created by dkms.
 %patch8 -p1 -b .mkdrpm-split-ver-rel
 %patch9 -p1 -b .fix-kernel-make-prepare
 
-#gunzip %{name}.8.gz
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' %{name}.8 dkms dkms_autoinstaller dkms_framework.conf
-gzip %{name}.8
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/{%{_dkmsdir},%{_sbindir},%{_mandir}/man8,%{_sysconfdir}/%{name},%{_initrddir}}
-install -m 755 dkms %{buildroot}/%{_sbindir}/dkms
-install -m 644 dkms.8.gz %{buildroot}/%{_mandir}/man8
-install -m 644 dkms_framework.conf  %{buildroot}%{_sysconfdir}/%{name}/framework.conf
-install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/%{name}/
-install -m 644 dkms_dbversion %{buildroot}/%{_dkmsdir}/dkms_dbversion
-install -m 755 dkms_autoinstaller %{buildroot}%{_initrddir}/%{name}
+mkdir -p %{buildroot}%{_mandir}/man8
+%makeinstall_std INITD=%{buildroot}%{_initrddir}
 install -m 755 dkms_mkkerneldoth %{buildroot}/%{_sbindir}/dkms_mkkerneldoth
-
-# bash completion
-install -d -m 755 %{buildroot}%{_sysconfdir}/bash_completion.d
-install -m 644 dkms.bash-completion %{buildroot}%{_sysconfdir}/bash_completion.d/%{name}
+mv %{buildroot}%{_initrddir}/dkms_autoinstaller %{buildroot}%{_initrddir}/dkms
 
 %clean 
 rm -rf %{buildroot}
