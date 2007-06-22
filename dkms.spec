@@ -62,9 +62,7 @@ sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{nam
 gzip %{name}.8
 
 %install
-if [ "%{buildroot}" != "/" ]; then
-        rm -rf %{buildroot}
-fi
+rm -rf %{buildroot}
 mkdir -p %{buildroot}/{%{_dkmsdir},%{_sbindir},%{_mandir}/man8,%{_sysconfdir}/%{name},%{_initrddir}}
 install -m 755 dkms %{buildroot}/%{_sbindir}/dkms
 install -m 644 dkms.8.gz %{buildroot}/%{_mandir}/man8
@@ -79,9 +77,7 @@ install -d -m 755 %{buildroot}%{_sysconfdir}/bash_completion.d
 install -m 644 dkms.bash-completion %{buildroot}%{_sysconfdir}/bash_completion.d/%{name}
 
 %clean 
-if [ "%{buildroot}" != "/" ]; then
-        rm -rf %{buildroot}
-fi
+rm -rf %{buildroot}
 
 %post minimal
 %_post_service %{name}
