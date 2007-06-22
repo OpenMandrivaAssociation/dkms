@@ -1,8 +1,8 @@
 Summary: 	Dynamic Kernel Module Support Framework
 Name: 		dkms
-Version: 	2.0.16
+Version: 	2.0.17
 URL:		http://linux.dell.com/dkms
-Release: 	%mkrel 4
+Release: 	%mkrel 1
 License: 	GPL
 Group:  	System/Base
 BuildArch: 	noarch
@@ -13,17 +13,12 @@ Requires(post):	rpm-helper
 Requires:	patch
 Source:		http://linux.dell.com/dkms/%{name}-%{version}.tar.bz2
 Source1:	template-dkms-mkrpm.spec
-Source2:	dkms.bash-completion
-Patch1:		dkms-2.0.5.9-norpm.patch
+Patch1:		dkms-2.0.17-norpm.patch
 Patch2:		dkms-2.0.13-mdkize.patch
-Patch3:		dkms-2.0.9-rpmbuild.patch
 Patch4:		dkms-2.0.2-compressed-module.patch
-Patch5:		dkms-2.0.9-pinit.patch
-Patch6:		dkms-2.0.8-pass-arch.patch
 Patch7:		dkms-2.0.9-procconfig.patch
-Patch8:		dkms-2.0.10-split-version-release.patch
+Patch8:		dkms-2.0.17-split-version-release.patch
 Patch9:		dkms-fix-kernel-make-prepare.patch
-Patch10:	dkms-2.0.16-alias_number.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
 %define _dkmsdir %{_localstatedir}/%{name}
@@ -57,14 +52,10 @@ as created by dkms.
 %setup -q
 %patch1 -p1 -b .norpm
 %patch2 -p1 -b .mdkize
-%patch3 -p1 -b .rpmbuild
 %patch4 -p1 -b .compressed-module
-%patch5 -p1 -b .pinit
-%patch6 -p1 -b .pass-arch
 %patch7 -p1 -b .procconfig
-%patch8 -p3 -b .mkdrpm-split-ver-rel
+%patch8 -p1 -b .mkdrpm-split-ver-rel
 %patch9 -p1 -b .fix-kernel-make-prepare
-%patch10 -p1 -b .alias_number
 
 #gunzip %{name}.8.gz
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' %{name}.8 dkms dkms_autoinstaller dkms_framework.conf
@@ -85,7 +76,7 @@ install -m 755 dkms_mkkerneldoth %{buildroot}/%{_sbindir}/dkms_mkkerneldoth
 
 # bash completion
 install -d -m 755 %{buildroot}%{_sysconfdir}/bash_completion.d
-install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/bash_completion.d/%{name}
+install -m 644 dkms.bash-completion %{buildroot}%{_sysconfdir}/bash_completion.d/%{name}
 
 %clean 
 if [ "%{buildroot}" != "/" ]; then
