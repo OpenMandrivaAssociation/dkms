@@ -6,7 +6,7 @@ Release: 	%mkrel 4
 License: 	GPL
 Group:  	System/Base
 BuildArch: 	noarch
-Requires:	kernel-devel
+Requires:	kernel-source
 Requires:	%{name}-minimal = %{version}-%{release}
 Requires(pre):	rpm-helper
 Requires(post):	rpm-helper
