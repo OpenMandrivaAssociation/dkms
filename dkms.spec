@@ -2,7 +2,7 @@ Summary: 	Dynamic Kernel Module Support Framework
 Name: 		dkms
 Version: 	2.0.17
 URL:		http://linux.dell.com/dkms
-Release: 	%mkrel 6
+Release: 	%mkrel 7
 License: 	GPL
 Group:  	System/Base
 BuildArch: 	noarch
@@ -63,6 +63,7 @@ sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{nam
 rm -rf %{buildroot}
 mkdir -p %{buildroot}%{_mandir}/man8
 %makeinstall_std INITD=%{buildroot}%{_initrddir}
+install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/%{name}/
 install -m 755 dkms_mkkerneldoth %{buildroot}/%{_sbindir}/dkms_mkkerneldoth
 mv %{buildroot}%{_initrddir}/dkms_autoinstaller %{buildroot}%{_initrddir}/dkms
 
