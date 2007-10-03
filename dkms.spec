@@ -15,6 +15,7 @@ Source:		http://linux.dell.com/dkms/%{name}-%{version}.tar.bz2
 Source1:	template-dkms-mkrpm.spec
 Patch1:		dkms-2.0.17-norpm.patch
 Patch2:		dkms-2.0.13-mdkize.patch
+Patch3:		dkms-fix-kernel-make-prepare.patch
 Patch4:		dkms-2.0.2-compressed-module.patch
 Patch7:		dkms-2.0.9-procconfig.patch
 Patch8:		dkms-2.0.17-split-version-release.patch
@@ -53,6 +54,7 @@ as created by dkms.
 %setup -q
 %patch1 -p1 -b .norpm
 %patch2 -p1 -b .mdkize
+%patch3 -p1 -b .fix-kernel-make-prepare
 %patch4 -p1 -b .compressed-module
 %patch7 -p1 -b .procconfig
 %patch8 -p1 -b .mkdrpm-split-ver-rel
