@@ -21,7 +21,6 @@ Patch7:		dkms-2.0.9-procconfig.patch
 Patch8:		dkms-2.0.17-split-version-release.patch
 Patch9:		dkms-2.0.17-bash-completion-update.patch
 Patch10:	dkms-2.0.17-binary_only.patch
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
 %define _dkmsdir %{_localstatedir}/%{name}
 
