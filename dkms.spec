@@ -1,8 +1,8 @@
 Summary: 	Dynamic Kernel Module Support Framework
 Name: 		dkms
-Version: 	2.0.17
+Version: 	2.0.17.5
 URL:		http://linux.dell.com/dkms
-Release: 	%mkrel 13
+Release: 	%mkrel 1
 License: 	GPL
 Group:  	System/Base
 BuildArch: 	noarch
@@ -11,14 +11,14 @@ Requires:	%{name}-minimal = %{version}-%{release}
 Requires(pre):	rpm-helper
 Requires(post):	rpm-helper
 Requires:	patch
-Source:		http://linux.dell.com/dkms/%{name}-%{version}.tar.bz2
+Source:		http://linux.dell.com/dkms/%{name}-%{version}.tar.gz
 Source1:	template-dkms-mkrpm.spec
 Patch1:		dkms-2.0.17-norpm.patch
-Patch2:		dkms-2.0.13-mdkize.patch
+Patch2:		dkms-2.0.17.5-mdkize.patch
 Patch3:		dkms-fix-kernel-make-prepare.patch
 Patch4:		dkms-2.0.2-compressed-module.patch
 Patch7:		dkms-2.0.9-procconfig.patch
-Patch8:		dkms-2.0.17-split-version-release.patch
+Patch8:		dkms-2.0.17.5-split-version-release.patch
 Patch9:		dkms-2.0.17-bash-completion-update.patch
 Patch10:	dkms-2.0.17-binary_only.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
@@ -57,7 +57,7 @@ as created by dkms.
 %patch3 -p1 -b .fix-kernel-make-prepare
 %patch4 -p1 -b .compressed-module
 %patch7 -p1 -b .procconfig
-%patch8 -p1 -b .mkdrpm-split-ver-rel
+%patch8 -p1 -b .mdkrpm-split-ver-rel
 %patch9 -p1 -b .bash-completion-update
 %patch10 -p1 -b .binary_only
 
