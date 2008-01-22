@@ -2,7 +2,7 @@ Summary: 	Dynamic Kernel Module Support Framework
 Name: 		dkms
 Version: 	2.0.17.5
 URL:		http://linux.dell.com/dkms
-Release: 	%mkrel 2
+Release: 	%mkrel 3
 License: 	GPL
 Group:  	System/Base
 BuildArch: 	noarch
@@ -21,6 +21,7 @@ Patch7:		dkms-2.0.9-procconfig.patch
 Patch8:		dkms-2.0.17.5-split-version-release.patch
 Patch9:		dkms-2.0.17-bash-completion-update.patch
 Patch10:	dkms-2.0.17-binary_only.patch
+Patch11:	dkms-2.0.17.5-min-max-kernel.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
 %define _dkmsdir %{_localstatedir}/%{name}
@@ -60,6 +61,7 @@ as created by dkms.
 %patch8 -p1 -b .mdkrpm-split-ver-rel
 %patch9 -p1 -b .bash-completion-update
 %patch10 -p1 -b .binary_only
+%patch11 -p1 -b .min-max-kernel
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' %{name}.8 dkms dkms_autoinstaller dkms_framework.conf
 
