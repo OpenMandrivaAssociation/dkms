@@ -17,7 +17,7 @@ Source1:	template-dkms-mkrpm.spec
 Patch1:		dkms-2.0.17-norpm.patch
 Patch2:		dkms-2.0.17.5-mdkize.patch
 Patch3:		dkms-fix-kernel-make-prepare.patch
-Patch4:		dkms-2.0.2-compressed-module.patch
+Patch4:		dkms-2.0.17.6-compressed-module.patch
 Patch7:		dkms-2.0.9-procconfig.patch
 Patch8:		dkms-2.0.17.5-split-version-release.patch
 Patch9:		dkms-2.0.17-bash-completion-update.patch
