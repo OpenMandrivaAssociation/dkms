@@ -7,6 +7,7 @@ License: 	GPL
 Group:  	System/Base
 BuildArch: 	noarch
 Requires:	kernel-devel
+Suggests:	kernel-devel-latest
 Requires:	%{name}-minimal = %{version}-%{release}
 Requires(pre):	rpm-helper
 Requires(post):	rpm-helper
