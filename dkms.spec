@@ -24,6 +24,7 @@ Patch9:		dkms-2.0.17-bash-completion-update.patch
 Patch10:	dkms-2.0.17-binary_only.patch
 Patch11:	dkms-2.0.17.5-min-max-kernel.patch
 Patch12:	dkms-2.0.17.6-test-dkms.conf-existence.patch
+Patch13:	dkms-2.0.17.6-status_default.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
 %define _dkmsdir %{_localstatedir}/%{name}
@@ -65,6 +66,7 @@ as created by dkms.
 %patch10 -p1 -b .binary_only
 %patch11 -p1 -b .min-max-kernel
 %patch12 -p1 -b .test-dkmsconf
+%patch13 -p1 -b .status_default
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' %{name}.8 dkms dkms_autoinstaller dkms_framework.conf
 
