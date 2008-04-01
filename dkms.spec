@@ -70,7 +70,11 @@ as created by dkms.
 %patch13 -p1 -b .status_default
 %patch14 -p1 -b .stdout
 
-sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' %{name}.8 dkms dkms_autoinstaller dkms_framework.conf
+sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
+  dkms_autoinstaller \
+  dkms_framework.conf \
+  %{name}.8 \
+  dkms
 
 %install
 rm -rf %{buildroot}
@@ -102,5 +106,3 @@ rm -rf %{buildroot}
 %{_mandir}/man8/dkms.8*
 %config(noreplace) %{_sysconfdir}/dkms
 %{_sysconfdir}/bash_completion.d/%{name}
-
-
