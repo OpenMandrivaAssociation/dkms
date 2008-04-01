@@ -18,6 +18,7 @@ Patch1:		dkms-2.0.17-norpm.patch
 Patch2:		dkms-2.0.17.5-mdkize.patch
 Patch3:		dkms-fix-kernel-make-prepare.patch
 Patch4:		dkms-2.0.17.6-compressed-module.patch
+Patch5:	dkms-2.0.19-weak_module_name.patch
 Patch7:		dkms-2.0.9-procconfig.patch
 Patch8:		dkms-2.0.19-mdkrpm-split-ver-rel.patch
 Patch9:		dkms-2.0.17-bash-completion-update.patch
@@ -28,7 +29,6 @@ Patch13:	dkms-2.0.17.6-status_default.patch
 Patch14:	dkms-2.0.17.6-stdout.patch
 Patch15:	dkms-2.0.19-no_custom_rpm_provides.patch
 Patch16:	dkms-2.0.19-binary.patch
-Patch17:	dkms-2.0.19-weak_module_name.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
 %define _dkmsdir %{_localstatedir}/%{name}
@@ -65,6 +65,7 @@ as created by dkms.
 %patch2 -p1 -b .mdkize
 %patch3 -p1 -b .fix-kernel-make-prepare
 %patch4 -p1 -b .compressed-module
+%patch5 -p1 -b .weak_module_name
 %patch7 -p1 -b .procconfig
 %patch8 -p1 -b .mdkrpm-split-ver-rel
 %patch9 -p1 -b .bash-completion-update
@@ -75,7 +76,6 @@ as created by dkms.
 %patch14 -p1 -b .stdout
 %patch15 -p1 -b .no_custom_rpm_provides
 %patch16 -p1 -b .binary
-%patch17 -p1 -b .weak_module_name
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
