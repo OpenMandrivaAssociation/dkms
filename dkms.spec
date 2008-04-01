@@ -1,8 +1,8 @@
 Summary: 	Dynamic Kernel Module Support Framework
 Name: 		dkms
-Version: 	2.0.17.6
+Version: 	2.0.19
 URL:		http://linux.dell.com/dkms
-Release: 	%mkrel 2
+Release: 	%mkrel 1
 License: 	GPL
 Group:  	System/Base
 BuildArch: 	noarch
@@ -19,9 +19,9 @@ Patch2:		dkms-2.0.17.5-mdkize.patch
 Patch3:		dkms-fix-kernel-make-prepare.patch
 Patch4:		dkms-2.0.17.6-compressed-module.patch
 Patch7:		dkms-2.0.9-procconfig.patch
-Patch8:		dkms-2.0.17.5-split-version-release.patch
+Patch8:		dkms-2.0.19-mdkrpm-split-ver-rel.patch
 Patch9:		dkms-2.0.17-bash-completion-update.patch
-Patch10:	dkms-2.0.17-binary_only.patch
+Patch10:	dkms-2.0.19-binary_only.patch
 Patch11:	dkms-2.0.17.5-min-max-kernel.patch
 Patch12:	dkms-2.0.17.6-test-dkms.conf-existence.patch
 Patch13:	dkms-2.0.17.6-status_default.patch
