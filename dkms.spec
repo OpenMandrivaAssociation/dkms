@@ -26,9 +26,11 @@ Patch11:	dkms-2.0.17.5-min-max-kernel.patch
 Patch12:	dkms-2.0.17.6-test-dkms.conf-existence.patch
 Patch13:	dkms-2.0.17.6-status_default.patch
 Patch14:	dkms-2.0.17.6-stdout.patch
+Patch15:	dkms-2.0.19-no_custom_rpm_provides.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
 %define _dkmsdir %{_localstatedir}/%{name}
+%define _dkmsbinarydir %{_localstatedir}/%{name}-binary
 
 %description
 This package contains the framework for the Dynamic
@@ -69,6 +71,7 @@ as created by dkms.
 %patch12 -p1 -b .test-dkmsconf
 %patch13 -p1 -b .status_default
 %patch14 -p1 -b .stdout
+%patch15 -p1 -b .no_custom_rpm_provides
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
