@@ -76,6 +76,7 @@ as created by dkms.
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
   dkms_framework.conf \
+  kernel_*.d_dkms \
   %{name}.8 \
   dkms
 
@@ -108,4 +109,7 @@ rm -rf %{buildroot}
 %{_sbindir}/dkms_mkkerneldoth
 %{_mandir}/man8/dkms.8*
 %config(noreplace) %{_sysconfdir}/dkms
+# these dirs are for plugins - owned by other packages
+%{_sysconfdir}/kernel/postinst.d/%{name}
+%{_sysconfdir}/kernel/prerm.d/%{name}
 %{_sysconfdir}/bash_completion.d/%{name}
