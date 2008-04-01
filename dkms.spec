@@ -75,7 +75,7 @@ as created by dkms.
 %patch14 -p1 -b .stdout
 %patch15 -p1 -b .no_custom_rpm_provides
 %patch16 -p1 -b .binary
-%patch17 -p1 -b .binary
+%patch17 -p1 -b .weak_module_name
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
