@@ -27,6 +27,7 @@ Patch12:	dkms-2.0.17.6-test-dkms.conf-existence.patch
 Patch13:	dkms-2.0.17.6-status_default.patch
 Patch14:	dkms-2.0.17.6-stdout.patch
 Patch15:	dkms-2.0.19-no_custom_rpm_provides.patch
+Patch16:	dkms-2.0.19-binary.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
 %define _dkmsdir %{_localstatedir}/%{name}
@@ -72,6 +73,7 @@ as created by dkms.
 %patch13 -p1 -b .status_default
 %patch14 -p1 -b .stdout
 %patch15 -p1 -b .no_custom_rpm_provides
+%patch16 -p1 -b .binary
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
@@ -87,6 +89,7 @@ mkdir -p %{buildroot}%{_mandir}/man8
 install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/%{name}/
 install -m 755 dkms_mkkerneldoth %{buildroot}/%{_sbindir}/dkms_mkkerneldoth
 mv %{buildroot}%{_initrddir}/dkms_autoinstaller %{buildroot}%{_initrddir}/dkms
+mkdir -p %{buildroot}%{_dkmsbinarydir}
 
 %clean 
 rm -rf %{buildroot}
@@ -105,6 +108,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %{_sbindir}/dkms
 %{_dkmsdir}
+%dir %{_dkmsbinarydir}
 %{_initrddir}/%{name}
 %{_sbindir}/dkms_mkkerneldoth
 %{_mandir}/man8/dkms.8*
