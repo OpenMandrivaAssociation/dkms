@@ -14,6 +14,7 @@ Requires(post):	rpm-helper
 Requires:	patch
 Source:		http://linux.dell.com/dkms/%{name}-%{version}.tar.gz
 Source1:	template-dkms-mkrpm.spec
+Source2:	dkms.depmod.conf
 Patch1:		dkms-2.0.17-norpm.patch
 Patch2:		dkms-2.0.17.5-mdkize.patch
 Patch3:		dkms-fix-kernel-make-prepare.patch
@@ -92,6 +93,8 @@ install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/%{name}/
 install -m 755 dkms_mkkerneldoth %{buildroot}/%{_sbindir}/dkms_mkkerneldoth
 mv %{buildroot}%{_initrddir}/dkms_autoinstaller %{buildroot}%{_initrddir}/dkms
 mkdir -p %{buildroot}%{_dkmsbinarydir}
+mkdir -p %{buildroot}%{_sysconfdir}/depmod.d
+install -m644 %{SOURCE2} %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
 
 %clean 
 rm -rf %{buildroot}
@@ -119,3 +122,4 @@ rm -rf %{buildroot}
 %{_sysconfdir}/kernel/postinst.d/%{name}
 %{_sysconfdir}/kernel/prerm.d/%{name}
 %{_sysconfdir}/bash_completion.d/%{name}
+%{_sysconfdir}/depmod.d/%{name}.conf
