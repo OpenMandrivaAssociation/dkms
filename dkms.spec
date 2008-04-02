@@ -19,7 +19,7 @@ Patch1:		dkms-2.0.17-norpm.patch
 Patch2:		dkms-2.0.17.5-mdkize.patch
 Patch3:		dkms-fix-kernel-make-prepare.patch
 Patch4:		dkms-2.0.17.6-compressed-module.patch
-Patch5:	dkms-2.0.19-weak_module_name.patch
+Patch5:		dkms-2.0.19-weak_module_name.patch
 Patch7:		dkms-2.0.9-procconfig.patch
 Patch8:		dkms-2.0.19-mdkrpm-split-ver-rel.patch
 Patch9:		dkms-2.0.17-bash-completion-update.patch
