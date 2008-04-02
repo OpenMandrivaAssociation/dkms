@@ -31,6 +31,7 @@ Patch14:	dkms-2.0.17.6-stdout.patch
 Patch15:	dkms-2.0.19-no_custom_rpm_provides.patch
 Patch16:	dkms-2.0.19-binary.patch
 Patch17:	dkms-2.0.19-autoalias.patch
+Patch18:	dkms-2.0.19-mkrpm_status.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
 %define _dkmsdir %{_localstatedir}/%{name}
@@ -79,6 +80,7 @@ as created by dkms.
 %patch15 -p1 -b .no_custom_rpm_provides
 %patch16 -p1 -b .binary
 %patch17 -p0 -b .autoalias
+%patch18 -p1 -b .mkrpm
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
