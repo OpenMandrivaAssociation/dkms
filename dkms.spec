@@ -78,7 +78,7 @@ as created by dkms.
 %patch14 -p1 -b .stdout
 %patch15 -p1 -b .no_custom_rpm_provides
 %patch16 -p1 -b .binary
-%patch17 -p0 -b .binary
+%patch17 -p0 -b .autoalias
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
