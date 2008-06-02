@@ -36,8 +36,8 @@ Patch19:	dkms-2.0.19-skip-unused-check.patch
 Patch20:	dkms-2.0.19-uninstall-speedup.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
-%define _dkmsdir %{_localstatedir}/%{name}
-%define _dkmsbinarydir %{_localstatedir}/%{name}-binary
+%define _dkmsdir %{_localstatedir}/lib/%{name}
+%define _dkmsbinarydir %{_localstatedir}/lib/%{name}-binary
 
 %description
 This package contains the framework for the Dynamic
