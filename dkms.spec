@@ -2,7 +2,7 @@ Summary: 	Dynamic Kernel Module Support Framework
 Name: 		dkms
 Version: 	2.0.19
 URL:		http://linux.dell.com/dkms
-Release: 	%mkrel 7
+Release: 	%mkrel 8
 License: 	GPL
 Group:  	System/Base
 BuildArch: 	noarch
