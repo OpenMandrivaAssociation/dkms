@@ -34,6 +34,7 @@ Patch17:	dkms-2.0.19-autoalias.patch
 Patch18:	dkms-2.0.19-mkrpm_status.patch
 Patch19:	dkms-2.0.19-skip-unused-check.patch
 Patch20:	dkms-2.0.19-uninstall-speedup.patch
+Patch21:	dkms-2.0.19-init-mdv-interactive.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
 %define _dkmsdir %{_localstatedir}/lib/%{name}
@@ -86,6 +87,7 @@ as created by dkms.
 %patch18 -p1 -b .mkrpm
 %patch19 -p1 -b .versionsanity
 %patch20 -p1 -b .uninst-speedup
+%patch21 -p1 -b .mdv-interactive
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
