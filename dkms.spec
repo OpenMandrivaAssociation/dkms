@@ -102,19 +102,13 @@ mkdir -p %{buildroot}%{_mandir}/man8
 %makeinstall_std INITD=%{buildroot}%{_initrddir}
 install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/%{name}/
 install -m 755 dkms_mkkerneldoth %{buildroot}/%{_sbindir}/dkms_mkkerneldoth
-mv %{buildroot}%{_initrddir}/dkms_autoinstaller %{buildroot}%{_initrddir}/dkms
+mv %{buildroot}%{_initrddir}/dkms_autoinstaller %{buildroot}%{_sbindir}
 mkdir -p %{buildroot}%{_dkmsbinarydir}
 mkdir -p %{buildroot}%{_sysconfdir}/depmod.d
 install -m644 %{SOURCE2} %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
 
 %clean 
 rm -rf %{buildroot}
-
-%post minimal
-%_post_service %{name}
-
-%preun minimal
-%_preun_service %{name}
 
 %files
 %defattr(-,root,root)
@@ -125,7 +119,7 @@ rm -rf %{buildroot}
 %{_sbindir}/dkms
 %{_dkmsdir}
 %dir %{_dkmsbinarydir}
-%{_initrddir}/%{name}
+%{_sbindir}/dkms_autoinstaller
 %{_sbindir}/dkms_mkkerneldoth
 %{_mandir}/man8/dkms.8*
 %config(noreplace) %{_sysconfdir}/dkms
