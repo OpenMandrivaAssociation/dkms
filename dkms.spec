@@ -113,13 +113,13 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root)
 %doc %attr (-,root,root) sample.spec sample.conf AUTHORS COPYING template-dkms-mkrpm.spec 
+%{_sbindir}/dkms_autoinstaller
 
 %files minimal
 %defattr(-,root,root)
 %{_sbindir}/dkms
 %{_dkmsdir}
 %dir %{_dkmsbinarydir}
-%{_sbindir}/dkms_autoinstaller
 %{_sbindir}/dkms_mkkerneldoth
 %{_mandir}/man8/dkms.8*
 %config(noreplace) %{_sysconfdir}/dkms
