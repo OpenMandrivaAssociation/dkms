@@ -15,7 +15,7 @@ Requires:	patch
 Source:		http://linux.dell.com/dkms/%{name}-%{version}.tar.gz
 Source1:	template-dkms-mkrpm.spec
 Source2:	dkms.depmod.conf
-Patch1:		dkms-2.0.17-norpm.patch
+Patch1:		dkms-2.0.19-norpm.patch
 Patch2:		dkms-2.0.17.5-mdkize.patch
 Patch3:		dkms-fix-kernel-make-prepare.patch
 Patch4:		dkms-2.0.17.6-compressed-module.patch
