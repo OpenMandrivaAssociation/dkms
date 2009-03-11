@@ -22,7 +22,7 @@ Patch4:		dkms-2.0.17.6-compressed-module.patch
 Patch5:		dkms-2.0.19-weak_module_name.patch
 Patch7:		dkms-2.0.19-procconfig.patch
 Patch8:		dkms-2.0.19-mdkrpm-split-ver-rel.patch
-Patch9:		dkms-2.0.17-bash-completion-update.patch
+Patch9:		dkms-2.0.19-bash-completion-update.patch
 Patch10:	dkms-2.0.19-binary_only.patch
 Patch11:	dkms-2.0.17.5-min-max-kernel.patch
 Patch12:	dkms-2.0.17.6-test-dkms.conf-existence.patch
