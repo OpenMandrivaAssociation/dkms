@@ -2,7 +2,7 @@ Summary: 	Dynamic Kernel Module Support Framework
 Name: 		dkms
 Version: 	2.0.19
 URL:		http://linux.dell.com/dkms
-Release: 	%mkrel 14
+Release: 	%mkrel 15
 License: 	GPL
 Group:  	System/Base
 BuildArch: 	noarch
@@ -15,6 +15,7 @@ Requires:	patch
 Source:		http://linux.dell.com/dkms/%{name}-%{version}.tar.gz
 Source1:	template-dkms-mkrpm.spec
 Source2:	dkms.depmod.conf
+Source3:	autoload.awk
 Patch1:		dkms-2.0.19-norpm.patch
 Patch2:		dkms-2.0.17.5-mdkize.patch
 Patch3:		dkms-fix-kernel-make-prepare.patch
@@ -36,6 +37,7 @@ Patch19:	dkms-2.0.19-skip-unused-check.patch
 Patch20:	dkms-2.0.19-uninstall-speedup.patch
 Patch21:	dkms-2.0.19-init-mdv-interactive.patch
 Patch22:	dkms-symvers.patch
+Patch23:	dkms-2.0.19-autoload_instead_of_udevadm.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
 %define _dkmsdir %{_localstatedir}/lib/%{name}
@@ -90,6 +92,7 @@ as created by dkms.
 %patch20 -p1 -b .uninst-speedup
 %patch21 -p1 -b .mdv-interactive
 %patch22 -p1 -b .symvers
+%patch23 -p1 -b .autoload_instead_of_udevadm
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
@@ -104,6 +107,7 @@ mkdir -p %{buildroot}%{_mandir}/man8
 %makeinstall_std INITD=%{buildroot}%{_initrddir}
 install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/%{name}/
 install -m 755 dkms_mkkerneldoth %{buildroot}/%{_sbindir}/dkms_mkkerneldoth
+install -m 755 %{SOURCE3} %{buildroot}/%{_sbindir}/dkms_autoload
 mv %{buildroot}%{_initrddir}/dkms_autoinstaller %{buildroot}%{_sbindir}
 mkdir -p %{buildroot}%{_dkmsbinarydir}
 mkdir -p %{buildroot}%{_sysconfdir}/depmod.d
@@ -126,6 +130,7 @@ rm -rf %{buildroot}
 %{_dkmsdir}
 %dir %{_dkmsbinarydir}
 %{_sbindir}/dkms_mkkerneldoth
+%{_sbindir}/dkms_autoload
 %{_mandir}/man8/dkms.8*
 %config(noreplace) %{_sysconfdir}/dkms
 # these dirs are for plugins - owned by other packages
