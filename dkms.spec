@@ -2,7 +2,7 @@ Summary: 	Dynamic Kernel Module Support Framework
 Name: 		dkms
 Version: 	2.0.19
 URL:		http://linux.dell.com/dkms
-Release: 	%mkrel 24
+Release: 	%mkrel 25
 License: 	GPL
 Group:  	System/Base
 BuildArch: 	noarch
@@ -39,6 +39,7 @@ Patch20:	dkms-2.0.19-uninstall-speedup.patch
 Patch21:	dkms-2.0.19-init-mdv-interactive.patch
 Patch22:	dkms-symvers.patch
 Patch23:	dkms-2.0.19-autoload_instead_of_udevadm.patch
+Patch24:	dkms-generic-preparation-for-2.6.39-and-higher
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
 %define _dkmsdir %{_localstatedir}/lib/%{name}
@@ -94,6 +95,7 @@ as created by dkms.
 %patch21 -p1 -b .mdv-interactive
 %patch22 -p1 -b .symvers
 %patch23 -p1 -b .autoload_instead_of_udevadm
+%patch24 -p1 -b .generic-prepare
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
