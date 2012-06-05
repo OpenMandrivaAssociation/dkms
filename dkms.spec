@@ -39,6 +39,7 @@ Patch21:	dkms-2.0.19-init-mdv-interactive.patch
 Patch22:	dkms-symvers.patch
 Patch23:	dkms-2.0.19-autoload_instead_of_udevadm.patch
 Patch24:	dkms-generic-preparation-for-2.6.39-and-higher
+Patch25:	dkms-2.0.19-parallel-build.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
 %define _dkmsdir %{_localstatedir}/lib/%{name}
@@ -95,6 +96,7 @@ as created by dkms.
 %patch22 -p1 -b .symvers
 %patch23 -p1 -b .autoload_instead_of_udevadm
 %patch24 -p1 -b .generic-prepare
+%patch25 -p1 -b .paralllel~
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
