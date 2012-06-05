@@ -3,7 +3,7 @@ Name:		dkms
 Version:	2.0.19
 URL:		http://linux.dell.com/dkms
 Release:	29
-License:	GPL
+License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
 Requires:	kernel-devel
