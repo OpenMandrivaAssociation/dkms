@@ -134,4 +134,4 @@ rm -f /etc/rc.d/*/{K,S}??dkms
 %{_sysconfdir}/kernel/postinst.d/%{name}
 %{_sysconfdir}/kernel/prerm.d/%{name}
 %{_sysconfdir}/bash_completion.d/%{name}
-%{_sysconfdir}/depmod.d/%{name}.conf
+%config %{_sysconfdir}/depmod.d/%{name}.conf
