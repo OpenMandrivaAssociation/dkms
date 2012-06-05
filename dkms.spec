@@ -130,8 +130,10 @@ rm -f /etc/rc.d/*/{K,S}??dkms
 %{_sbindir}/dkms_autoload
 %{_mandir}/man8/dkms.8*
 %config(noreplace) %{_sysconfdir}/dkms
-# these dirs are for plugins - owned by other packages
+%dir %{_sysconfdir}/kernel
+%dir %{_sysconfdir}/kernel/postinst.d/
 %{_sysconfdir}/kernel/postinst.d/%{name}
+%dir %{_sysconfdir}/kernel/prerm.d/
 %{_sysconfdir}/kernel/prerm.d/%{name}
 %{_sysconfdir}/bash_completion.d/%{name}
 %config %{_sysconfdir}/depmod.d/%{name}.conf
