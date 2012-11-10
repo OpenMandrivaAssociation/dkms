@@ -1,0 +1,5 @@
+sources:
+  "autoload.awk:"	8abbf1af885a7641eb5f715743c557cd60ccb6ff
+  "dkms-2.0.19.tar.gz:"	a7a31de8d2d4057c47e892b3d55f060e05230f1a
+  "dkms.depmod.conf:"	2ba5ae9ca78d5ec66696cf9d12e2972a0baf17ce
+  "template-dkms-mkrpm.spec:"	026c92f618bc32df3a12090e6ea0fb59046f8a2f

@@ -1,0 +1,227 @@
+Index: dkms-2.0.19/dkms
+===================================================================
+--- dkms-2.0.19/dkms
++++ dkms-2.0.19/dkms	2008-04-18 02:42:20.000000000 +0300
+@@ -52,6 +52,7 @@
+     echo $"              [--kernelsourcedir=source-location] [--no-prepare-kernel]"
+     echo $"              [--binaries-only] [--source-only] [-r release (SuSE)] [--verbose]"
+     echo $"              [--size] [--spec=specfile] [--media=floppy|iso|tar]"
++    echo $"              [--binary]"
+ }
+ 
+ function readlink()
+@@ -157,7 +158,7 @@
+ 	    arch_array[$i]=`echo $line | awk {'print $4'} | sed 's/:$//'`
+ 	    i=$(($i + 1))
+ 	done < <($0 status -m "$module" -v "$module_version" 2>/dev/null | \
+-		 egrep "built|installed" | egrep -v 'installed-weak')
++		 egrep "built|installed" | egrep -v 'installed-(weak|binary)')
+     fi
+ 
+     # Set default kernel version and arch, if none set (but only --all isn't set)
+@@ -333,6 +334,11 @@
+ 	sles*) echo "/updates" && return ;;
+ 	suse*) echo "/updates" && return ;;
+ 	Ubuntu*) echo "/updates/dkms" && return ;;
++	MandrivaLinux*)
++	    prefix=${binary:+$dkms_binary_location}
++	    prefix=${prefix:-$dkms_source_location}
++	    echo "$prefix${orig_location#/kernel}"
++	    return ;;
+ 	*) ;;
+     esac
+     echo "$orig_location"
+@@ -1050,6 +1056,7 @@
+ function install_module()
+ {
+     setup_kernels_arches "install"
++    set_install_binary_variables
+     local base_dir="$dkms_tree/$module/$module_version/${kernelver_array[0]}/${arch_array[0]}"
+ 
+     # Check that the right arguments were passed
+@@ -1061,7 +1068,7 @@
+     fi
+ 
+     # Check that $module-$module_version exists by checking the source symlink
+-    if ! [ -d "$dkms_tree/$module/$module_version/source" ]; then
++    if [ -z "$binary" ] && [ ! -d "$dkms_tree/$module/$module_version/source" ]; then
+ 	echo $"" >&2
+ 	echo $"Error! DKMS tree does not contain: $module-$module_version" >&2
+ 	echo $"Build cannot continue without the proper tree." >&2
+@@ -1135,12 +1142,14 @@
+     while [ "$count" -lt ${#built_module_name[@]} ]; do
+ 	echo $""
+ 	echo $"${dest_module_name[$count]}$module_suffix:"
+-	local module_count=`find $lib_tree -name ${dest_module_name[$count]}$module_suffix -type f | wc -l | awk {'print $1'}`
++	# Mandriva: do not remove original modules since module order is set in depmod.conf
++	if false; then
++	local module_count=`find $lib_tree -name ${dest_module_name[$count]}$module_suffix -type f 2>/dev/null | wc -l | awk {'print $1'}`
+ 	echo $" - Original module"
+ 	if ! [ -L "$dkms_tree/$module/kernel-${kernelver_array[0]}-${arch_array[0]}" ]; then
+ 	    local archive_pref1="$lib_tree/extra/${dest_module_name[$count]}$module_suffix"
+ 	    local archive_pref2="$lib_tree/updates/${dest_module_name[$count]}$module_suffix"
+-	    local archive_pref3="$lib_tree${dest_module_location[$count]}/${dest_module_name[$count]}$module_suffix"
++	    local archive_pref3="$lib_tree${dest_module_name[$count]}$module_suffix"
+ 	    local archive_pref4=""
+ 	    [ "$module_count" -eq 1 ] && archive_pref4="`find $lib_tree -name ${dest_module_name[$count]}$module_suffix -type f`"
+ 	    local original_module=""
+@@ -1180,6 +1189,7 @@
+ 		mv -f $module_dup "$dkms_tree/$module/original_module/${kernelver_array[0]}/${arch_array[0]}/collisions/$dup_tree"
+ 	    done
+ 	fi
++	fi
+ 
+         # Copy module to its location
+ 	echo $" - Installation"
+@@ -1598,6 +1608,7 @@
+ function uninstall_module ()
+ {
+     setup_kernels_arches "uninstall"
++    set_install_binary_variables
+ 
+     # Check that the right arguments were passed
+     if [ -z "$module" ] || [ -z "$module_version" ]; then
+@@ -1639,6 +1650,8 @@
+     if [ "$kernel_symlink" == "$module_version/${kernelver_array[0]}/${arch_array[0]}" ]; then
+ 	do_uninstall "${kernelver_array[0]}" "${arch_array[0]}"
+     else
++	# Detect a valid binary dkms module upgrade situation
++	[ -n "$binary" ] && [ -n "$rpm_safe_upgrade" ] && [ -e "$dkms_tree/$module/$kernel_symlink" ] && exit 0
+ 	echo $"" >&2
+ 	echo $"Error! The module $module $module_version is not currently installed." >&2
+ 	echo $"This module is not currently ACTIVE for kernel ${kernelver_array[0]} (${arch_array[0]})." >&2
+@@ -1746,6 +1759,13 @@
+     echo ""
+ }
+ 
++function set_install_binary_variables() {
++    if [ -n "$binary" ]; then
++	dkms_tree="$dkms_binary_tree"
++	conf="$dkms_binary_tree/$module/$module_version/${kernelver_array[0]}/dkms.conf"
++    fi
++}
++
+ # be careful.  string_array is global
+ declare -a string_array
+ function add_string_to_array_unique()
+@@ -1794,11 +1814,24 @@
+     # recognize weak modules.  These are in $kern/weak-updates but are symlinks to another $kern/extra file.
+ 
+     for installedkern in $(find "$install_tree" -maxdepth 1 -mindepth 1 -type d 2>/dev/null); do
+-	for ko in $(find "$installedkern/weak-updates" -type l 2>/dev/null); do
++	if [ -n "$binary" ]; then
++	    weak_location="$dkms_binary_location"
++	    weak_status="installed-binary"
++	    weak_type="f"
++	else
++	    weak_location="/weak-updates"
++	    weak_status="installed-weak"
++	    weak_type="l"
++	fi
++	for ko in $(find "$installedkern${weak_location}" -type "$weak_type" 2>/dev/null); do
+ 	    installedkernver=$(basename $installedkern)
+ 	    basename_ko=$(basename $ko)
+-	    readlink $ko
+-	    installed_ko="$read_link"
++	    if [ -n "$binary" ]; then
++		installed_ko=$ko
++	    else
++		readlink $ko
++		installed_ko="$read_link"
++	    fi
+ 	    if [ ! -e "$installed_ko" ]; then
+ 		# dangling symlink, ouch, but is somebody else's problem so ignore it
+ 		continue
+@@ -1820,7 +1853,7 @@
+ 			[ "$r_ver" == "$tree_ver" -o -z "$r_ver" ] && \
+ 			[ "$r_kern" == "$installedkernver" -o -z "$r_kern" ] && \
+ 			[ "$r_arch" == "$tree_arch" -o -z "$r_arch" ]; then
+-			add_string_to_array_unique "$mod, $tree_ver, $installedkernver, $tree_arch: installed-weak from $tree_kern"
++			add_string_to_array_unique "$mod, $tree_ver, $installedkernver, $tree_arch: ${weak_status} from $tree_kern"
+ 		    fi
+ 		fi
+ 	    done
+@@ -1829,6 +1862,13 @@
+     print_string_array
+ }
+ 
++function do_status_binary ()
++{
++    local binary="true"
++    local dkms_tree="$dkms_binary_tree"
++    do_status_weak $*
++}
++
+ do_status ()
+ {
+     local mod="$1"; shift
+@@ -1904,10 +1944,12 @@
+     if [ ${#kernelver_array[@]} -eq 0 ]; then
+ 	do_status "$module" "$module_version" "${kernelver_array[0]}" "${arch_array[0]}" 0
+ 	do_status_weak "$module" "$module_version" "${kernelver_array[0]}" "${arch_array[0]}"
++	do_status_binary "$module" "$module_version" "${kernelver_array[0]}" "${arch_array[0]}"
+     else
+ 	while [ $j -lt ${#kernelver_array[@]} ]; do
+ 	    do_status "$module" "$module_version" "${kernelver_array[$j]}" "${arch_array[$j]}" 0
+ 	    do_status_weak "$module" "$module_version" "${kernelver_array[$j]}" "${arch_array[$j]}"
++	    do_status_binary "$module" "$module_version" "${kernelver_array[$j]}" "${arch_array[$j]}"
+ 	    j=$(($j + 1))
+ 	done
+     fi
+@@ -3215,7 +3257,11 @@
+ 
+ # Set important variables
+ current_kernel=`uname -r`
+-dkms_tree="/var/lib/dkms"
++dkms_source_tree="/var/lib/dkms"
++dkms_binary_tree="/var/lib/dkms-binary"
++dkms_source_location="/dkms"
++dkms_binary_location="/dkms-binary"
++dkms_tree="$dkms_source_tree"
+ source_tree="/usr/src"
+ install_tree="/lib/modules"
+ tmp_location="/tmp"
+@@ -3250,6 +3296,7 @@
+ binaries_only=""
+ source_only=""
+ all=""
++binary=""
+ module_suffix=""
+ rpm_safe_upgrade=""
+ size="1440";
+@@ -3356,6 +3403,9 @@
+ 	--rpm_safe_upgrade)
+ 	    rpm_safe_upgrade="true"
+ 	    ;;
++	--binary)
++	    binary="true"
++	    ;;
+ 	--dkmstree*)
+ 	    if echo $1 | grep '=' >/dev/null ; then
+ 		dkms_tree=`echo $1 | sed 's/^.*=//'`
+Index: dkms-2.0.19/dkms_autoinstaller
+===================================================================
+--- dkms-2.0.19/dkms_autoinstaller
++++ dkms-2.0.19/dkms_autoinstaller	2008-04-15 07:45:22.000000000 +0300
+@@ -86,7 +86,7 @@
+ 			# a mod can be both built and installed-weak (stupid, but could be)
+ 			# but installed-weak comes last, so use tail
+ 			current_state=`dkms status -m $module_in_tree -v $version_in_tree -k $kernel -a $arch 2>/dev/null | awk {'print $5'} | tail -n 1`
+-			[ "$current_state" == "installed" -o "$current_state" == "installed-weak" ] && already_installed="true" && already_installed_version=$version_in_tree
++			[ "$current_state" == "installed" -o "$current_state" == "installed-weak" -o "$current_state" == "installed-binary" ] && already_installed="true" && already_installed_version=$version_in_tree
+ 		    fi
+ 		done
+ 
+Index: dkms-2.0.19/kernel_prerm.d_dkms
+===================================================================
+--- dkms-2.0.19/kernel_prerm.d_dkms
++++ dkms-2.0.19/kernel_prerm.d_dkms	2008-04-15 07:45:22.000000000 +0300
+@@ -10,7 +10,7 @@
+    arch=`echo "$line" | awk '{print $4}' | sed 's/:$//'`
+    echo "Uninstalling: $name $vers ($inst_kern) ($arch)"
+    dkms uninstall -m $name -v $vers -k $inst_kern -a $arch
+-done < <(dkms status -k $inst_kern 2>/dev/null | grep ": installed")
++done < <(dkms status -k $inst_kern 2>/dev/null | grep ": installed" | grep -v ": installed-binary")
+ fi
+ 
+ exit 0

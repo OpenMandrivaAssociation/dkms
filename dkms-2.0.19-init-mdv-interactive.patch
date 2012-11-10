@@ -1,0 +1,12 @@
+Index: dkms-2.0.19/dkms_autoinstaller
+===================================================================
+--- dkms-2.0.19/dkms_autoinstaller
++++ dkms-2.0.19/dkms_autoinstaller	2008-08-24 21:24:29.000000000 +0300
+@@ -7,6 +7,7 @@
+ #
+ ### BEGIN INIT INFO
+ # Provides: dkms
++# X-Mandriva-Interactive
+ # Default-Start: 3 4 5
+ # Default-Stop: 0 1 2 6
+ # Required-Start: $local_fs

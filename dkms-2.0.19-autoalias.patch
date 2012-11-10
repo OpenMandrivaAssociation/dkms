@@ -1,0 +1,51 @@
+--- dkms	2008-04-01 23:26:38.000000000 +0200
++++ dkms	2008-04-02 16:17:41.000000000 +0200
+@@ -357,6 +357,8 @@
+     unset modules_conf_obsoletes
+     unset MODULES_CONF_ALIAS_TYPE
+     unset modules_conf_alias_type
++    unset MODULES_CONF_EXTRACT_ALIASES
++    unset modules_conf_extract_aliases
+     unset MODULES_CONF_OBSOLETE_ONLY
+     unset modules_conf_obsolete_only
+     unset STRIP
+@@ -410,6 +412,7 @@
+ 	dest_module_location[$index]=${DEST_MODULE_LOCATION[$index]}
+ 	modules_conf_obsoletes[$index]=${MODULES_CONF_OBSOLETES[$index]}
+ 	modules_conf_alias_type[$index]=${MODULES_CONF_ALIAS_TYPE[$index]}
++	modules_conf_extract_aliases[$index]=${MODULES_CONF_EXTRACT_ALIASES[$index]}
+ 	case "${MODULES_CONF_OBSOLETE_ONLY[$index]}" in
+ 	    [yY]*)
+ 		modules_conf_obsolete_only[$index]="yes"
+@@ -690,6 +693,16 @@
+ 	done
+     done
+ 
++    if [ -d /etc/modprobe.d ]; then
++	local index=0
++	while [ $index -lt ${#dest_module_name[@]} ]; do
++	    if [ "${modules_conf_extract_aliases[$index]}" = yes -a -f $install_tree/${kernelver_array[0]}${dest_module_location[$index]}/${dest_module_name[$index]}$module_suffix ]; then
++		modinfo $install_tree/${kernelver_array[0]}${dest_module_location[$index]}/${dest_module_name[$index]}$module_suffix | sed -n -e "s/alias:\(.*\)$/alias \1 ${dest_module_name[$index]}/p" > /etc/modprobe.d/dkms-aliases-${dest_module_name[$index]}
++	    fi
++	    index=$(($index+1))
++	done
++    fi
++
+     # Delete the temp dir
+     rm -rf $temp_dir_name
+ }
+@@ -1600,6 +1613,14 @@
+     # But only do this if it was just ACTIVE on the kernel we just uninstalled from
+     [ -n "$was_active" ] && [ -n "$remake_initrd" ] && $0 status -m $module -v $module_version | grep -q "installed" && moduleconfig_add "$1"
+ 
++    if ! $0 status -m $module -v $module_version | grep -q "installed"; then
++	local index=0
++	while [ $index -lt ${#built_module_name[@]} ]; do
++	    rm -f /etc/modprobe.d/dkms-aliases-${dest_module_name[$index]}
++	    index=$(($index+1))
++	done
++    fi
++
+     # Run depmod because we changed /lib/modules
+     invoke_command "depmod -a ${kernelver_array[0]}" "depmod" background
+ 

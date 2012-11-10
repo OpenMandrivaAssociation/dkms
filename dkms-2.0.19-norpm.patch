@@ -1,0 +1,115 @@
+--- dkms-2.0.19/dkms.norpm	2008-03-25 14:53:31.000000000 +0100
++++ dkms-2.0.19/dkms	2009-03-11 11:33:56.000000000 +0100
+@@ -164,9 +164,10 @@ function setup_kernels_arches ()
+     if [ "$1" != "status" ]; then
+ 	[ -z "${kernelver_array[0]}" ] && [ -z "$all" ] && kernelver_array[0]=`uname -r`
+ 	if [ -z "${arch_array[0]}" ] && [ -n "${kernelver_array[0]}" ]; then
+-	    kernelver_rpm=`rpm -qf "/lib/modules/${kernelver_array[0]}" 2>/dev/null | grep -v "not owned by any package" | grep kernel | head -n 1`
+-	    if ! arch_array[0]=`rpm -q --queryformat "%{ARCH}" "$kernelver_rpm" 2>/dev/null`; then
++	    [ -z "$rpm_safe_upgrade" ] && kernelver_rpm=`rpm -qf "/lib/modules/${kernelver_array[0]}" 2>/dev/null | grep -v "not owned by any package" | grep kernel | head -n 1`
++	    if [ -n "$rpm_safe_upgrade" ] || ! arch_array[0]=`rpm -q --queryformat "%{ARCH}" "$kernelver_rpm" 2>/dev/null`; then
+ 		arch_array[0]=`uname -m`
++		[[ ${arch_array[0]} = i?86 ]] && arch_array[0]=i586
+ 		if [ ${arch_array[0]} == "x86_64" ] && \
+ 		    grep -q Intel /proc/cpuinfo && \
+ 		    ls $install_tree/${kernelver_array[0]}/build/configs \
+@@ -252,63 +253,14 @@ function remake_initrd()
+ 
+ function distro_version()
+ {
+-# What distribution are we running?
+-    local WHATPROVIDES_REDHAT_RELEASE
+-    local WHATPROVIDES_SLES_RELEASE
+-    local WHATPROVIDES_SUSE_RELEASE
+-    local REDHAT_RELEASE
+-    local CENTOS_RELEASE
+-    local FEDORA_RELEASE
+     local LSB_RELEASE
+-    local VER
+     local dist=unknown
+ 
+-    if which rpm > /dev/null 2>&1 ; then
+-	WHATPROVIDES_REDHAT_RELEASE=$(rpm -q --whatprovides redhat-release)
+-	if [ $? -eq 0 ]; then
+-	    if $(echo "${WHATPROVIDES_REDHAT_RELEASE}" | grep redhat-release > /dev/null 2>&1) ; then
+-		REDHAT_RELEASE=1
+-	    elif (echo "${WHATPROVIDES_REDHAT_RELEASE}" | grep centos-release > /dev/null 2>&1) ; then
+-		CENTOS_RELEASE=1
+-	    elif $(echo "${WHATPROVIDES_REDHAT_RELEASE}" | grep fedora-release > /dev/null 2>&1) ; then
+-		FEDORA_RELEASE=1
+-	    fi
+-	fi
+-
+-	WHATPROVIDES_SLES_RELEASE=$(rpm -q --whatprovides sles-release)
+-	if [ $? -eq 0 ]; then
+-	    SLES_RELEASE=1
+-	fi
+-
+-	WHATPROVIDES_SUSE_RELEASE=$(rpm -q --whatprovides suse-release)
+-	if [ $? -eq 0 ]; then
+-	    SUSE_RELEASE=1
+-	fi
+-    fi
+     if [ -r /etc/lsb-release ]; then
+ 	. /etc/lsb-release
+ 	LSB_RELEASE=1
+     fi
+-
+-    if [ -n "${FEDORA_RELEASE}" ]; then
+-	VER=$(rpm -q --qf "%{version}\n" ${WHATPROVIDES_REDHAT_RELEASE})
+-	dist=fc${VER}
+-    elif [ -n "${REDHAT_RELEASE}" ]; then
+-	VER=$(rpm -q --qf "%{version}\n" ${WHATPROVIDES_REDHAT_RELEASE})
+-        # format is 3AS, 4AS, 5Desktop...
+-	VER=$(echo "${VER}" | sed -e 's/^\([[:digit:]]*\).*/\1/g')
+-	dist=el${VER}
+-    elif [ -n "${CENTOS_RELEASE}" ]; then
+-	VER=$(rpm -q --qf "%{version}\n" ${WHATPROVIDES_REDHAT_RELEASE})
+-        # format is 3, 4, ...
+-	dist=el${VER}
+-    elif [ -n "${SLES_RELEASE}" ]; then
+-	VER=$(rpm -q --qf "%{version}\n" ${WHATPROVIDES_SLES_RELEASE})
+-	dist=sles${VER}
+-    elif [ -n "${SUSE_RELEASE}" ]; then
+-	VER=$(rpm -q --qf "%{version}\n" ${WHATPROVIDES_SUSE_RELEASE})
+-	dist=suse${VER}
+-    elif [ -n "${LSB_RELEASE}" ]; then
++    if [ -n "${LSB_RELEASE}" ]; then
+ 	if [ -n "${DISTRIB_ID}" -a -n "${DISTRIB_RELEASE}" ]; then
+ 	    dist="${DISTRIB_ID}${DISTRIB_RELEASE}"
+ 	fi
+--- dkms-2.0.19/dkms_autoinstaller.norpm	2007-09-20 04:59:22.000000000 +0200
++++ dkms-2.0.19/dkms_autoinstaller	2009-03-11 11:34:11.000000000 +0100
+@@ -42,10 +42,9 @@ function invoke_command ()
+ # Set Variables
+ output_loc="/dev/console"
+ [ -n "$2" ] && kernel=$2 && output_loc="/dev/stdout" || kernel=`uname -r`
+-kernelver_rpm=`rpm -qf "/lib/modules/$kernel" 2>/dev/null | grep -v "not owned by any package" | grep kernel | head -1`
+-if ! arch=`rpm -q --queryformat "%{ARCH}" "$kernelver_rpm" 2>/dev/null`; then
+-    [ `uname -m` == "x86_64" ] && [ `cat /proc/cpuinfo | grep -c "Intel"` -gt 0 ] && [ `ls $install_tree/$kernel/build/configs 2>/dev/null | grep -c "ia32e"` -gt 0 ] && arch="ia32e" || arch=`uname -m`
+-fi
++#kernelver_rpm=`rpm -qf "/lib/modules/$kernel" 2>/dev/null | grep -v "not owned by any package" | grep kernel | head -1`
++[ `uname -m` == "x86_64" ] && [ `cat /proc/cpuinfo | grep -c "Intel"` -gt 0 ] && [ `ls $install_tree/$kernel/build/configs 2>/dev/null | grep -c "ia32e"` -gt 0 ] && arch="ia32e" || arch=`uname -m`
++[[ $arch = i?86 ]] && arch=i586
+ kernel_preparation_done=""
+ dkms_tree="/var/lib/dkms"
+ . /etc/dkms/framework.conf 2>/dev/null
+@@ -134,7 +133,8 @@ case "$1" in
+ 	# ignore
+ 	;;
+   restart)
+-        # ignore
++        $0 stop
++        $0 start
+         ;;
+   force-reload)
+         # ignore
+@@ -146,7 +146,7 @@ case "$1" in
+ 	exit 0
+ 	;;
+   *)
+-	echo $"Usage: $0 {start|stop}"
++	echo $"Usage: $0 {start|stop|restart|reload}"
+ esac
+ 
+ exit 0

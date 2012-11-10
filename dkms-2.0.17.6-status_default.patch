@@ -1,0 +1,12 @@
+diff -p -up dkms-2.0.17.6/dkms.status_default dkms-2.0.17.6/dkms
+--- dkms-2.0.17.6/dkms.status_default	2008-03-31 14:56:05.000000000 +0200
++++ dkms-2.0.17.6/dkms	2008-03-31 15:22:26.000000000 +0200
+@@ -1870,6 +1870,8 @@ do_status ()
+ 	if [ "$state" == "built" ] || [ "$state" == "installed" ]; then
+ 	    set_module_suffix "$kern"
+ 	    local extra_status=""
++	    local module=$mod
++	    local module_version=$ver
+ 	    conf="$dkms_tree/$mod/$ver/source/dkms.conf"
+ 	    read_conf "$kern" "$arch" "$conf"
+ 	    [ -d "$dkms_tree/$mod/original_module/$kern/$arch" ] && extra_status="(original_module exists)"

@@ -1,0 +1,38 @@
+diff -p -up dkms-2.0.17.6/dkms.compressed-module dkms-2.0.17.6/dkms
+--- dkms-2.0.17.6/dkms.compressed-module	2008-03-31 18:31:26.000000000 +0200
++++ dkms-2.0.17.6/dkms	2008-03-31 18:35:45.000000000 +0200
+@@ -93,6 +93,10 @@ function set_module_suffix ()
+     else
+ 	module_suffix=".ko"
+     fi
++    grep -q '\.gz:' /lib/modules/$kernel_test/modules.dep 2>/dev/null && gz_modules=1
++    if [ -n "$gz_modules" ]; then
++	[ -z "$delayed_gzip" ] && module_suffix=${module_suffix}.gz
++    fi
+ }
+ 
+ function set_kernel_source_dir ()
+@@ -1377,9 +1381,14 @@ function do_build()
+     while [ "$count" -lt "${#built_module_name[@]}" ]; do
+ 	[ "${strip[$count]}" != "no" ] && strip -g "$dkms_tree/$module/$module_version/build/${built_module_location[$count]}${built_module_name[$count]}$module_suffix"
+ 	cp -f "$dkms_tree/$module/$module_version/build/${built_module_location[$count]}${built_module_name[$count]}$module_suffix" "$base_dir/module/${dest_module_name[$count]}$module_suffix" >/dev/null
++	if [ -n "$gz_modules" ]; then
++	    gzip -9f $dkms_tree/$module/$module_version/${kernelver_array[0]}/${arch_array[0]}/module/${dest_module_name[$count]}$module_suffix
++	fi
+ 	count=$(($count+1))
+     done
+-
++    if [ -n "$gz_modules" ]; then
++	module_suffix=${module_suffix}.gz
++    fi
+     # Run the post_build script
+     if [ -n "$post_build" ] && [ -x `echo "$dkms_tree/$module/$module_version/source/$post_build" | sed 's/ .*//'` ]; then
+ 	echo $""
+@@ -3425,6 +3434,7 @@ for action_to_run in $action; do
+ 	    remove_module
+ 	    ;;
+ 	build)
++	    delayed_gzip=1
+ 	    build_module
+ 	    ;;
+ 	install)

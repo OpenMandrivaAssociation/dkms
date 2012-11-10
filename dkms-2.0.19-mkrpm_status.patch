@@ -1,0 +1,14 @@
+diff -p -up dkms-2.0.19/dkms.mkrpm_status dkms-2.0.19/dkms
+--- dkms-2.0.19/dkms.mkrpm_status	2008-04-02 22:59:46.000000000 +0200
++++ dkms-2.0.19/dkms	2008-04-02 22:59:11.000000000 +0200
+@@ -3027,8 +3027,9 @@ make_rpm()
+ 	RC=7
+     fi
+     rm -rf $temp_dir_name
+-    trap > /dev/null 2>&1
++    trap - EXIT HUP TERM > /dev/null 2>&1
+     [ ${RC} -ne 0 ] && exit ${RC}
++    true
+ }
+ 
+ function preproc_file()

@@ -1,0 +1,24 @@
+Index: dkms-2.0.19/dkms
+===================================================================
+--- dkms-2.0.19/dkms
++++ dkms-2.0.19/dkms	2008-05-04 20:28:00.000000000 +0300
+@@ -1547,6 +1547,8 @@
+ 	fi
+ 
+ 	count=0
++	last_instance=
++	[ `$0 status -m $module -v $module_version | grep -c "installed"` -eq 1 ] && last_instance=1
+ 	while [ "$count" -lt "${#built_module_name[@]}" ]; do
+ 	    real_dest_module_location="$(find_actual_dest_module_location $module $count $1 $2)"
+ 	    echo $""
+@@ -1564,9 +1566,7 @@
+ 		echo $"   - Use the dkms install command to reinstall any previous module version."
+ 
+ 	        # Remove modules_conf entries from /etc/modules.conf if remake_initrd is set or if this is last instance removed
+-		if [ -n "$remake_initrd" ] || \
+-		    [ `$0 status -m $module -v $module_version | \
+-			grep -c "installed"` -eq 1 ]; then
++		if [ -n "$remake_initrd" ] || [ -n "$last_instance" ]; then
+ 		    echo $""
+ 		    moduleconfig_remove "${kernelver_array[0]}"
+ 		fi

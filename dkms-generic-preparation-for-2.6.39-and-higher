@@ -1,0 +1,26 @@
+From 407eaee62cf75f259f6844a29f9d063ce1039628 Mon Sep 17 00:00:00 2001
+From: Franck Bui <franck.bui@mandriva.com>
+Date: Fri, 16 Dec 2011 22:24:48 +0100
+Subject: [PATCH 1/1] kernel 2.6.39 and higher use now the generic kernel
+ preparation
+
+---
+ dkms |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/dkms b/dkms
+index 807596a..f121d64 100755
+--- a/dkms
++++ b/dkms
+@@ -903,7 +903,7 @@ function prepare_kernel()
+ 
+     if [[ (! ( $(VER $1) < $(VER 2.6.5) ) || (-d /etc/SuSEconfig)) && \
+        -d "$kernel_source_dir" && \
+-       ! -L "$kernel_source_dir" && \
++       ($(VER $1) > $(VER 2.6.38) || ! -L "$kernel_source_dir") && \
+        -z "$ksourcedir_fromcli" ]]; then
+ 	echo $""
+ 	echo $"Kernel preparation unnecessary for this kernel.  Skipping..."
+-- 
+1.7.7.4
+

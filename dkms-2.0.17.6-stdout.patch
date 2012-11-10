@@ -1,0 +1,12 @@
+diff -p -up dkms-2.0.17.6/dkms_autoinstaller.stdout dkms-2.0.17.6/dkms_autoinstaller
+--- dkms-2.0.17.6/dkms_autoinstaller.stdout	2008-03-31 15:26:45.000000000 +0200
++++ dkms-2.0.17.6/dkms_autoinstaller	2008-03-31 17:51:14.000000000 +0200
+@@ -40,7 +40,7 @@ function invoke_command ()
+ 
+ 
+ # Set Variables
+-output_loc="/dev/console"
++output_loc="/dev/stdout"
+ [ -n "$2" ] && kernel=$2 && output_loc="/dev/stdout" || kernel=`uname -r`
+ #kernelver_rpm=`rpm -qf "/lib/modules/$kernel" 2>/dev/null | grep -v "not owned by any package" | grep kernel | head -1`
+ [ `uname -m` == "x86_64" ] && [ `cat /proc/cpuinfo | grep -c "Intel"` -gt 0 ] && [ `ls $install_tree/$kernel/build/configs 2>/dev/null | grep -c "ia32e"` -gt 0 ] && arch="ia32e" || arch=`uname -m`
