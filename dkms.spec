@@ -1,19 +1,18 @@
-Summary: 	Dynamic Kernel Module Support Framework
-Name: 		dkms
-Version: 	2.0.19
+Summary:	Dynamic Kernel Module Support Framework
+Name:		dkms
+Version:	2.0.19
 URL:		http://linux.dell.com/dkms
-%define subrel 2
-Release: 	28
-License: 	GPL
-Group:  	System/Base
-BuildArch: 	noarch
+Release: 	31
+License:	GPL
+Group:		System/Base
+BuildArch:	noarch
 Suggests:	kernel-devel
 Requires:	%{name}-minimal = %{version}-%{release}
 Requires(pre):	rpm-helper
 Requires(post):	rpm-helper
 Requires:	patch
 Requires:	sed
-Requires:       gawk
+Requires:	gawk
 Source:		http://linux.dell.com/dkms/%{name}-%{version}.tar.gz
 Source1:	template-dkms-mkrpm.spec.src
 Source2:	dkms.depmod.conf
@@ -41,7 +40,6 @@ Patch21:	dkms-2.0.19-init-mdv-interactive.patch
 Patch22:	dkms-symvers.patch
 Patch23:	dkms-2.0.19-autoload_instead_of_udevadm.patch
 Patch24:	dkms-generic-preparation-for-2.6.39-and-higher
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root/
 
 %define _dkmsdir %{_localstatedir}/lib/%{name}
 %define _dkmsbinarydir %{_localstatedir}/lib/%{name}-binary
@@ -56,9 +54,9 @@ This package is intended for building binary kernel
 modules with dkms source packages installed
 
 %package minimal
-Summary: 	Dynamic Kernel Module Support Framework - minimal package
-License: 	GPL
-Group: 		System/Base
+Summary:	Dynamic Kernel Module Support Framework - minimal package
+License:	GPL
+Group:		System/Base
 Requires:	lsb-release
 Requires(preun):	rpm-helper
 Requires(post):	rpm-helper
@@ -106,7 +104,6 @@ sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{nam
   dkms
 
 %install
-rm -rf %{buildroot}
 mkdir -p %{buildroot}%{_mandir}/man8
 %makeinstall_std INITD=%{buildroot}%{_initrddir}
 install -D -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.spec
@@ -120,16 +117,11 @@ install -m644 %{SOURCE2} %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
 %triggerpostun -- dkms < 2.0.19-11
 rm -f /etc/rc.d/*/{K,S}??dkms
 
-%clean 
-rm -rf %{buildroot}
-
 %files
-%defattr(-,root,root)
 %doc %attr (-,root,root) sample.spec sample.conf AUTHORS COPYING template-dkms-mkrpm.spec 
 %{_sbindir}/dkms_autoinstaller
 
 %files minimal
-%defattr(-,root,root)
 %{_sbindir}/dkms
 %{_dkmsdir}
 %dir %{_dkmsbinarydir}
