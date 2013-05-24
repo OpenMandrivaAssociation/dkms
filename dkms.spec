@@ -47,7 +47,7 @@ modules with dkms source packages installed
 
 %package	minimal
 Summary:	Dynamic Kernel Module Support Framework - minimal package
-License:	GPLv+2
+License:	GPLv2+
 Group:		System/Base
 Requires:	lsb-release
 Requires(preun):rpm-helper
