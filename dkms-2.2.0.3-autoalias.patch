@@ -1,23 +1,25 @@
---- dkms	2008-04-01 23:26:38.000000000 +0200
-+++ dkms	2008-04-02 16:17:41.000000000 +0200
-@@ -357,6 +357,8 @@
-     unset modules_conf_obsoletes
-     unset MODULES_CONF_ALIAS_TYPE
-     unset modules_conf_alias_type
-+    unset MODULES_CONF_EXTRACT_ALIASES
-+    unset modules_conf_extract_aliases
-     unset MODULES_CONF_OBSOLETE_ONLY
-     unset modules_conf_obsolete_only
-     unset STRIP
-@@ -410,6 +412,7 @@
+--- dkms-2.2.0.3/dkms.autoalias	2013-05-24 22:38:12.164909302 +0200
++++ dkms-2.2.0.3/dkms	2013-05-24 22:41:20.267571240 +0200
+@@ -32,8 +32,8 @@ readonly dkms_conf_variables="CLEAN REMA
+        DEST_MODULE_NAME dest_module_name MODULES_CONF_OBSOLETES
+        DEST_MODULE_LOCATION dest_module_location
+        modules_conf_obsoletes MODULES_CONF_ALIAS_TYPE
+-       modules_conf_alias_type STRIP strip MODULES_CONF_OBSOLETE_ONLY
+-       modules_conf_obsolete_only AUTOINSTALL"
++       modules_conf_alias_type MODULES_CONF_EXTRACT_ALIASES MODULES_CONF_OBSOLETE_ONLY
++       STRIP strip MODULES_CONF_OBSOLETE_ONLY modules_conf_obsolete_only AUTOINSTALL"
+ 
+ # Some important regular expressions.  Requires bash 3 or above.
+ # Any poor souls still running bash 2 or older really need an upgrade.
+@@ -517,6 +517,7 @@ read_conf()
  	dest_module_location[$index]=${DEST_MODULE_LOCATION[$index]}
  	modules_conf_obsoletes[$index]=${MODULES_CONF_OBSOLETES[$index]}
  	modules_conf_alias_type[$index]=${MODULES_CONF_ALIAS_TYPE[$index]}
 +	modules_conf_extract_aliases[$index]=${MODULES_CONF_EXTRACT_ALIASES[$index]}
- 	case "${MODULES_CONF_OBSOLETE_ONLY[$index]}" in
- 	    [yY]*)
- 		modules_conf_obsolete_only[$index]="yes"
-@@ -690,6 +693,16 @@
+ 	case ${MODULES_CONF_OBSOLETE_ONLY[$index]} in
+ 	    [yY]*) modules_conf_obsolete_only[$index]="yes";;
+ 	esac
+@@ -897,6 +898,16 @@ moduleconfig_remove()
  	done
      done
  
@@ -34,9 +36,9 @@
      # Delete the temp dir
      rm -rf $temp_dir_name
  }
-@@ -1600,6 +1613,14 @@
-     # But only do this if it was just ACTIVE on the kernel we just uninstalled from
-     [ -n "$was_active" ] && [ -n "$remake_initrd" ] && $0 status -m $module -v $module_version | grep -q "installed" && moduleconfig_add "$1"
+@@ -1671,6 +1682,14 @@ do_uninstall()
+     # Run the post_remove script
+     run_build_script post_remove "$post_remove"
  
 +    if ! $0 status -m $module -v $module_version | grep -q "installed"; then
 +	local index=0
@@ -47,5 +49,5 @@
 +    fi
 +
      # Run depmod because we changed /lib/modules
-     invoke_command "depmod -a ${kernelver_array[0]}" "depmod" background
+     invoke_command "do_depmod $1" "depmod" background
  

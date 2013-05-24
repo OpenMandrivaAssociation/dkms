@@ -1,0 +1,11 @@
+--- dkms-2.2.0.3/dkms.generic-prepare	2013-05-24 23:17:20.989522146 +0200
++++ dkms-2.2.0.3/dkms	2013-05-24 23:17:39.997794056 +0200
+@@ -1059,7 +1059,7 @@ prepare_kernel()
+     if [[ (! ( $(VER $1) < $(VER 2.6.5) ) || -d /etc/SuSEconfig) && \
+        -d "$kernel_source_dir" && \
+        -z "$ksourcedir_fromcli" ]]; then
+-       ! -L "$kernel_source_dir" && \
++       ($(VER $1) > $(VER 2.6.38) || ! -L "$kernel_source_dir") && \
+ 	echo $""
+ 	echo $"Kernel preparation unnecessary for this kernel.  Skipping..."
+ 	no_clean_kernel="no-clean-kernel"

@@ -1,0 +1,17 @@
+--- dkms-2.2.0.3/dkms.mkrpm	2013-05-24 22:45:35.400181624 +0200
++++ dkms-2.2.0.3/dkms	2013-05-24 22:45:40.083247892 +0200
+@@ -2876,10 +2876,13 @@ make_rpm()
+ 	echo $"DKMS: mkrpm completed."
+     else
+ 	cat ${temp_dir_name}/rpmbuild.log >&2
+-	die 7 $"There was a problem creating your rpm."
++	RC=7
+     fi
+     rm -rf $temp_dir_name
++    trap - EXIT HUP TERM > /dev/null 2>&1
+     trap > /dev/null 2>&1
++    [ ${RC} -ne 0 ] && exit ${RC}
++    true
+ }
+ 
+ preproc_file()

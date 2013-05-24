@@ -1,0 +1,14 @@
+--- dkms-2.2.0.3/dkms.binary_only	2013-05-24 21:20:56.155595914 +0200
++++ dkms-2.2.0.3/dkms	2013-05-24 21:23:51.288076747 +0200
+@@ -2843,9 +2843,9 @@ make_rpm()
+     fi
+     if invoke_command "LC_ALL=C rpmbuild --define \"_topdir ${temp_dir_name}\" --define \"version $module_version\" ${module_release:+--define \"rel $module_release\"} --define \"module_name $module\" --define \"kernel_versions ${kernelver_array[*]}\" --define \"mktarball_line $mktarball_line\"  -ba ${temp_dir_name}/SPECS/dkms_mkrpm.spec > ${temp_dir_name}/rpmbuild.log 2>&1" "rpmbuild"
+ 	mkdir -p ${rpm_basedir}
+-	cp -a ${temp_dir_name}/SRPMS/* ${temp_dir_name}/RPMS/*/* ${rpm_basedir}/
++	cp -a ${temp_dir_name}/RPMS/*/* ${rpm_basedir}/
+ 	echo $""
+-	cat ${temp_dir_name}/rpmbuild.log | grep ^Wrote | sed -e "s:${temp_dir_name}/:${rpm_basedir}/:" -e 's:SRPMS/::' -e 's:RPMS/.*/::'
++	cat ${temp_dir_name}/rpmbuild.log | grep ^Wrote | sed -e "s:${temp_dir_name}/:${rpm_basedir}/:" -e 's:RPMS/.*/::'
+ 	echo $""
+ 	echo $"DKMS: mkrpm completed."
+     else

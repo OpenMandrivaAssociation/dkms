@@ -1,9 +1,9 @@
 Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
-Version:	2.0.19
+Version:	2.2.0.3
 URL:		http://linux.dell.com/dkms
-Release: 	32
-License:	GPLv2+
+Release: 	1
+License:	GPL
 Group:		System/Base
 BuildArch:	noarch
 Suggests:	kernel-devel
@@ -18,28 +18,17 @@ Source1:	template-dkms-mkrpm.spec.src
 Source2:	dkms.depmod.conf
 Source3:	autoload.awk
 Patch1:		dkms-2.0.19-norpm.patch
-Patch2:		dkms-2.0.17.5-mdkize.patch
-Patch3:		dkms-fix-kernel-make-prepare.patch
-Patch4:		dkms-2.0.17.6-compressed-module.patch
-Patch5:		dkms-2.0.19-weak_module_name.patch
-Patch7:		dkms-2.0.19-procconfig.patch
-Patch8:		dkms-2.0.19-mdkrpm-split-ver-rel.patch
-Patch9:		dkms-2.0.19-bash-completion-update.patch
-Patch10:	dkms-2.0.19-binary_only.patch
-Patch11:	dkms-2.0.17.5-min-max-kernel.patch
-Patch12:	dkms-2.0.17.6-test-dkms.conf-existence.patch
-Patch13:	dkms-2.0.17.6-status_default.patch
-Patch14:	dkms-2.0.17.6-stdout.patch
-Patch15:	dkms-2.0.19-no_custom_rpm_provides.patch
-Patch16:	dkms-2.0.19-binary.patch
-Patch17:	dkms-2.0.19-autoalias.patch
-Patch18:	dkms-2.0.19-mkrpm_status.patch
-Patch19:	dkms-2.0.19-skip-unused-check.patch
-Patch20:	dkms-2.0.19-uninstall-speedup.patch
-Patch21:	dkms-2.0.19-init-mdv-interactive.patch
-Patch22:	dkms-symvers.patch
-Patch23:	dkms-2.0.19-autoload_instead_of_udevadm.patch
-Patch24:	dkms-generic-preparation-for-2.6.39-and-higher
+Patch2:		dkms-2.2.0.3-mdkize.patch
+Patch4:		dkms-2.2.0.3-compressed-module.patch
+Patch7:		dkms-2.2.0.3-procconfig.patch
+Patch8:		dkms-2.2.0.3-mdkrpm-split-ver-rel.patch
+Patch10:	dkms-2.2.0.3-binary_only.patch
+Patch11:	dkms-2.2.0.3-min-max-kernel.patch
+Patch17:	dkms-2.2.0.3-autoalias.patch
+Patch18:	dkms-2.2.0.3-mkrpm_status.patch
+Patch21:	dkms-2.2.0.3-init-mdv-interactive.patch
+Patch22:	dkms-2.2.0.3-symvers.patch
+Patch24:	dkms-2.2.0.3-generic-preparation-for-2.6.39-and-higher
 
 %define _dkmsdir %{_localstatedir}/lib/%{name}
 %define _dkmsbinarydir %{_localstatedir}/lib/%{name}-binary
@@ -53,12 +42,12 @@ Computer Corporation.
 This package is intended for building binary kernel
 modules with dkms source packages installed
 
-%package	minimal
+%package minimal
 Summary:	Dynamic Kernel Module Support Framework - minimal package
 License:	GPL
 Group:		System/Base
 Requires:	lsb-release
-Requires(preun):rpm-helper
+Requires(preun):	rpm-helper
 Requires(post):	rpm-helper
 
 %description minimal
@@ -72,28 +61,16 @@ as created by dkms.
 
 %prep
 %setup -q
-%patch1 -p1 -b .norpm
 %patch2 -p1 -b .mdkize
-%patch3 -p1 -b .fix-kernel-make-prepare
 %patch4 -p1 -b .compressed-module
-%patch5 -p1 -b .weak_module_name
 %patch7 -p1 -b .procconfig
 %patch8 -p1 -b .mdkrpm-split-ver-rel
-%patch9 -p1 -b .bash-completion-update
 %patch10 -p1 -b .binary_only
 %patch11 -p1 -b .min-max-kernel
-%patch12 -p1 -b .test-dkmsconf
-%patch13 -p1 -b .status_default
-%patch14 -p1 -b .stdout
-%patch15 -p1 -b .no_custom_rpm_provides
-%patch16 -p1 -b .binary
-%patch17 -p0 -b .autoalias
+%patch17 -p1 -b .autoalias
 %patch18 -p1 -b .mkrpm
-%patch19 -p1 -b .versionsanity
-%patch20 -p1 -b .uninst-speedup
 %patch21 -p1 -b .mdv-interactive
 %patch22 -p1 -b .symvers
-%patch23 -p1 -b .autoload_instead_of_udevadm
 %patch24 -p1 -b .generic-prepare
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
@@ -104,20 +81,20 @@ sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{nam
   dkms
 
 %install
+mkdir -p %{buildroot}%{_mandir}/man8
 %makeinstall_std INITD=%{buildroot}%{_initrddir}
-install -m644 %{SOURCE1} -D %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.subspec
+install -m644 %{SOURCE1} -D %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.spec
 install -m755 dkms_mkkerneldoth -D %{buildroot}/%{_sbindir}/dkms_mkkerneldoth
-install -m755 %{SOURCE3} -D %{buildroot}%{_sbindir}/dkms_autoload
-mv %{buildroot}%{_initrddir}/dkms_autoinstaller %{buildroot}%{_sbindir}
+mv %{buildroot}%{_prefix}/lib/%{name}/dkms_autoinstaller %{buildroot}%{_sbindir}
+install -m755 %{SOURCE3} %{buildroot}%{_sbindir}/dkms_autoload
 mkdir -p %{buildroot}%{_dkmsbinarydir}
-mkdir -p %{buildroot}%{_sysconfdir}/depmod.d
 install -m644 %{SOURCE2} -D %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
 
 %triggerpostun -- dkms < 2.0.19-11
 rm -f /etc/rc.d/*/{K,S}??dkms
 
 %files
-%doc  sample.spec sample.conf AUTHORS COPYING template-dkms-mkrpm.subspec 
+%doc %attr (-,root,root) sample.spec sample.conf AUTHORS COPYING template-dkms-mkrpm.spec 
 %{_sbindir}/dkms_autoinstaller
 
 %files minimal
@@ -129,6 +106,8 @@ rm -f /etc/rc.d/*/{K,S}??dkms
 %{_mandir}/man8/dkms.8*
 %config(noreplace) %{_sysconfdir}/dkms
 # these dirs are for plugins - owned by other packages
+%dir %{_prefix}/lib/%{name}
+%{_prefix}/lib/%{name}/common.postinst
 %{_sysconfdir}/kernel/postinst.d/%{name}
 %{_sysconfdir}/kernel/prerm.d/%{name}
 %{_sysconfdir}/bash_completion.d/%{name}
