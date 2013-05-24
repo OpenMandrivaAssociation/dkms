@@ -1,0 +1,32 @@
+--- dkms-2.2.0.3/dkms.compressed-module	2013-05-24 20:36:53.627876061 +0200
++++ dkms-2.2.0.3/dkms	2013-05-24 20:38:55.794465350 +0200
+@@ -152,6 +152,10 @@ set_module_suffix()
+     kernel_test="${1-:$(uname -r)}"
+     module_suffix=".ko"
+     [[ $(VER $kernel_test) < $(VER 2.5) ]] && module_suffix=".o"
++    grep -q '\.gz:' /lib/modules/$kernel_test/modules.dep 2>/dev/null && gz_modules=1
++    if [ -n "$gz_modules" ]; then
++	[ -z "$delayed_gzip" ] && module_suffix=${module_suffix}.gz
++   fi
+ }
+ 
+ set_kernel_source_dir()
+@@ -1262,6 +1266,9 @@ do_build()
+ 	cp -f "$dkms_tree/$module/$module_version/build/${built_module_location[$count]}${built_module_name[$count]}$module_suffix" "$base_dir/module/${dest_module_name[$count]}$module_suffix" >/dev/null
+     done
+ 
++	if [ -n "$gz_modules" ]; then
++	    gzip -9f $dkms_tree/$module/$module_version/${kernelver_array[0]}/${arch_array[0]}/module/${dest_module_name[$count]}$module_suffix
++	fi
+     # Run the post_build script
+     run_build_script post_build "$post_build"
+ }
+@@ -3528,7 +3535,7 @@ for action_to_run in $action; do
+ 	match)        check_root && have_one_kernel && run_match;;
+ 	uninstall)    check_root && have_one_kernel && uninstall_module;;
+ 	mkdriverdisk) check_root && make_driver_disk;;
+-	build)        build_modules;;
++	build)        delayed_gzip=1 && build_modules;;
+ 	add)          add_module;;
+ 	mktarball)    make_tarball;;
+ 	mkrpm)        make_rpm;;

@@ -28,7 +28,10 @@ Patch17:	dkms-2.2.0.3-autoalias.patch
 Patch18:	dkms-2.2.0.3-mkrpm_status.patch
 Patch21:	dkms-2.2.0.3-init-mdv-interactive.patch
 Patch22:	dkms-2.2.0.3-symvers.patch
-Patch24:	dkms-2.2.0.3-generic-preparation-for-2.6.39-and-higher
+Patch24:	dkms-2.2.0.3-generic-preparation-for-2.6.39-and-higher.patch
+Patch25:	dkms-2.2.0.3-suggest-devel-not-source.patch
+Patch26:	dkms-2.2.0.3-xz-support.patch
+
 
 %define _dkmsdir %{_localstatedir}/lib/%{name}
 %define _dkmsbinarydir %{_localstatedir}/lib/%{name}-binary
@@ -72,6 +75,8 @@ as created by dkms.
 %patch21 -p1 -b .mdv-interactive
 %patch22 -p1 -b .symvers
 %patch24 -p1 -b .generic-prepare
+%patch25 -p1 -b .suggests-devel~
+%patch26 -p1 -b .xz_support~
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
