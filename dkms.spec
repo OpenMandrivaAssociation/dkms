@@ -2,8 +2,8 @@ Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
 Version:	2.0.19
 URL:		http://linux.dell.com/dkms
-Release: 	31
-License:	GPL
+Release: 	32
+License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
 Suggests:	kernel-devel
@@ -13,7 +13,7 @@ Requires(post):	rpm-helper
 Requires:	patch
 Requires:	sed
 Requires:	gawk
-Source:		http://linux.dell.com/dkms/%{name}-%{version}.tar.gz
+Source0:	http://linux.dell.com/dkms/%{name}-%{version}.tar.gz
 Source1:	template-dkms-mkrpm.spec.src
 Source2:	dkms.depmod.conf
 Source3:	autoload.awk
@@ -53,12 +53,12 @@ Computer Corporation.
 This package is intended for building binary kernel
 modules with dkms source packages installed
 
-%package minimal
+%package	minimal
 Summary:	Dynamic Kernel Module Support Framework - minimal package
 License:	GPL
 Group:		System/Base
 Requires:	lsb-release
-Requires(preun):	rpm-helper
+Requires(preun):rpm-helper
 Requires(post):	rpm-helper
 
 %description minimal
@@ -104,21 +104,20 @@ sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{nam
   dkms
 
 %install
-mkdir -p %{buildroot}%{_mandir}/man8
 %makeinstall_std INITD=%{buildroot}%{_initrddir}
-install -D -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.spec
-install -m 755 dkms_mkkerneldoth %{buildroot}/%{_sbindir}/dkms_mkkerneldoth
-install -m 755 %{SOURCE3} %{buildroot}/%{_sbindir}/dkms_autoload
+install -m644 %{SOURCE1} -D %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.subspec
+install -m755 dkms_mkkerneldoth -D %{buildroot}/%{_sbindir}/dkms_mkkerneldoth
+install -m755 %{SOURCE3} -D %{buildroot}%{_sbindir}/dkms_autoload
 mv %{buildroot}%{_initrddir}/dkms_autoinstaller %{buildroot}%{_sbindir}
 mkdir -p %{buildroot}%{_dkmsbinarydir}
 mkdir -p %{buildroot}%{_sysconfdir}/depmod.d
-install -m644 %{SOURCE2} %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
+install -m644 %{SOURCE2} -D %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
 
 %triggerpostun -- dkms < 2.0.19-11
 rm -f /etc/rc.d/*/{K,S}??dkms
 
 %files
-%doc %attr (-,root,root) sample.spec sample.conf AUTHORS COPYING template-dkms-mkrpm.spec 
+%doc  sample.spec sample.conf AUTHORS COPYING template-dkms-mkrpm.subspec 
 %{_sbindir}/dkms_autoinstaller
 
 %files minimal
