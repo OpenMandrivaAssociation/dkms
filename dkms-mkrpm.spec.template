@@ -34,7 +34,7 @@ dkms binary kernel modules for the %{module_name} driver version %{version},
 built for the %{kernel_versions} kernel(s).
 
 %(for kernel in %kernel_versions; do kflavour=`%kernel_flavour_cmd $kernel`; \
-      kversion=`rpm -qf --qf '%%{version}-%%{release}' /lib/modules/$kernel`; \
+      kpackage=`rpm -qf --qf '%{NAME}' /lib/modules/$kernel`; \
       echo -e "\
 %package -n	%{module_name}-kernel-$kernel\n\
 Summary:	%{module_name} driver for kernel ${kernel} \n\
@@ -45,9 +45,9 @@ Vendor:		%{vendor} \n\
 Group:		System/Kernel and hardware\n\
 Requires(post):	dkms-minimal >= 2.0.19\n\
 Requires(preun):dkms-minimal >= 2.0.19\n\
-Requires:	kernel-${kflavour} = ${kversion}
-Requires(post):	kernel-${kflavour} = ${kversion}
-Requires(preun):kernel-${kflavour} = ${kversion}
+Requires:	${kpackag}
+Requires(post):	${kpackage}
+Requires(preun):${kpackage} = ${kversion}
 Suggests:	%{module_name}-kernel-${kflavour}-latest \n\
 \n\
 %description -n %{module_name}-kernel-${kernel}\n\
@@ -74,9 +74,9 @@ built for latest kernel-${kflavour}."\
 
 %install
 for kernel in %kernel_versions; do
-mkdir -p %{buildroot}/%{moduledkmsbinarydir}/${kernel}
-cp -a %{moduledkmsdir}/${kernel} %{buildroot}/%{moduledkmsbinarydir}
-install %{modulesrcdir}/dkms.conf %{buildroot}/%{moduledkmsbinarydir}/${kernel}
+mkdir -p %{buildroot}%{moduledkmsbinarydir}/${kernel}
+cp -a %{moduledkmsdir}/${kernel} %{buildroot}%{moduledkmsbinarydir}
+install %{modulesrcdir}/dkms.conf %{buildroot}%{moduledkmsbinarydir}/${kernel}
 done
 
 %(for kernel in %{kernel_versions}; do echo -e "\
@@ -93,7 +93,7 @@ dkms uninstall --binary -m %{module_name} -v %{fake_version} -k ${kernel} --rpm_
 ;done)
 
 %(for kernel in %{kernel_versions};do echo -e "\
-%files -n %{module_name}-kernel-${kernel}\n%defattr(-,root,root)\n\
+%files -n %{module_name}-kernel-${kernel}\n\
 %dir %{_dkmsbinarydir}/%{module_name}\n\
 %dir %{moduledkmsbinarydir}\n\
 %{moduledkmsbinarydir}/${kernel}\n\
