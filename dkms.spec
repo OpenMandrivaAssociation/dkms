@@ -2,7 +2,7 @@ Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
 Version:	2.2.0.3
 URL:		http://linux.dell.com/dkms
-Release: 	1
+Release:	1
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
@@ -13,7 +13,7 @@ Requires(post):	rpm-helper
 Requires:	patch
 Requires:	sed
 Requires:	gawk
-Source0:	http://linux.dell.com/dkms/%{name}-%{version}.tar.gz
+Source0:	http://linux.dell.com/dkms/permalink/%{name}-%{version}.tar.gz
 Source1:	dkms-mkrpm.spec.template
 Source2:	dkms.depmod.conf
 Source3:	autoload.awk
