@@ -1,21 +1,21 @@
 %{?!module_name: %{error: You did not specify a module name (%%module_name)}}
 %{?!version: %{error: You did not specify a module version (%%version)}}
 %{?!kernel_versions: %{error: You did not specify kernel versions (%%kernel_version)}}
-%{?!packager: %define packager Mandrivalinux Team <http://www.mandriva.com>}
+%{?!packager: %define packager Moondrake GNU/Linux Team <http://www.moondrake.net>
 %{?!license: %define license Commercial}
 
 %{?!_dkmsdir: %define _dkmsdir %_localstatedir/lib/dkms}
 %{?!_srcdir: %define _srcdir %_prefix/src}
 %define fake_version %version
 %{?rel: %define fake_version %version-%rel}
-%{?!rel: %define rel %mkrel 1}
+%{?!rel: %define rel 1}
 %define modulesrcdir %{_srcdir}/%{module_name}-%{fake_version}
 %define moduledkmsdir %{_dkmsdir}/%{module_name}/%{fake_version}/
 %define _dkmsbinarydir %_localstatedir/lib/dkms-binary
 %define moduledkmsbinarydir %{_dkmsbinarydir}/%{module_name}/%{fake_version}
 
-%define kernel_flavour_rx /(?:.*)-(\\D.*)-(?:[^-]+(?:mdk|mdv|mnb))$/
-%define kernel_flavour_cmd perl -e '$ARGV[0] =~ %kernel_flavour_rx and print "$1\\n"'
+%define kernel_flavour_rx /(.*)-(\\D.*)/
+%define kernel_flavour_cmd perl -e '$ARGV[0] =~ %kernel_flavour_rx and print "$2\\n"'
 # find latest kernel for each flavour of the defined kernels
 %define kernels_latest %(perl -e 'foreach my $ver (sort(qw(%kernel_versions))) { $ver =~ %kernel_flavour_rx and $kernels{$1} = $ver }; print join(" ", values(%%kernels)) . "\\n"')
 %define latest_date %(date +%%Y%%m%%d)
@@ -25,9 +25,8 @@ Version:	%{version}
 Release:	%{rel}
 Summary:	%{module_name} driver for kernels %{kernel_versions}
 Group:		System/Kernel and hardware
-Vendor:		Mandriva
+Vendor:		%{vendor}
 License:	%{license}
-BuildRoot:	%{_tmppath}/%{name}-buildroot
 Provides:	%{module_name} = %{version}
 
 %description
@@ -35,20 +34,20 @@ dkms binary kernel modules for the %{module_name} driver version %{version},
 built for the %{kernel_versions} kernel(s).
 
 %(for kernel in %kernel_versions; do kflavour=`%kernel_flavour_cmd $kernel`; \
-      kpackage=`rpm -qf --qf '%{NAME}' /lib/modules/$kernel`; \
+      kversion=`rpm -qf --qf '%%{version}-%%{release}' /lib/modules/$kernel`; \
       echo -e "\
-%package -n %{module_name}-kernel-$kernel\n\
+%package -n	%{module_name}-kernel-$kernel\n\
 Summary:	%{module_name} driver for kernel ${kernel} \n\
 Version:	%{version} \n\
 Release:	%{rel} \n\
 License:	%{license} \n\
-Vendor:		Mandriva \n\
+Vendor:		%{vendor} \n\
 Group:		System/Kernel and hardware\n\
 Requires(post):	dkms-minimal >= 2.0.19\n\
-Requires(preun):	dkms-minimal >= 2.0.19\n\
-Requires:	${kpackage}
-Requires(post):	${kpackage}
-Requires(preun):	${kpackage}
+Requires(preun):dkms-minimal >= 2.0.19\n\
+Requires:	kernel-${kflavour} = ${kversion}
+Requires(post):	kernel-${kflavour} = ${kversion}
+Requires(preun):kernel-${kflavour} = ${kversion}
 Suggests:	%{module_name}-kernel-${kflavour}-latest \n\
 \n\
 %description -n %{module_name}-kernel-${kernel}\n\
@@ -57,10 +56,10 @@ built for the ${kernel} kernel."\
 ;done)
 
 %(for kernel in %kernels_latest; do kflavour=`%kernel_flavour_cmd $kernel`; echo -e "\
-%package -n %{module_name}-kernel-$kflavour-latest\n\
+%package -n	%{module_name}-kernel-$kflavour-latest\n\
 Summary:	%{module_name} driver for latest kernel-${kflavour} \n\
 Version:	%{version} \n\
-Vendor:		Mandriva \n\
+Vendor:		%{vednor} \n\
 Release:	1.%{latest_date}.%{rel} \n\
 License:	%{license} \n\
 Group:		System/Kernel and hardware\n\
@@ -74,15 +73,11 @@ built for latest kernel-${kflavour}."\
 %prep
 
 %install
-rm -rf $RPM_BUILD_ROOT
 for kernel in %kernel_versions; do
 mkdir -p %{buildroot}/%{moduledkmsbinarydir}/${kernel}
 cp -a %{moduledkmsdir}/${kernel} %{buildroot}/%{moduledkmsbinarydir}
 install %{modulesrcdir}/dkms.conf %{buildroot}/%{moduledkmsbinarydir}/${kernel}
 done
-
-%clean
-rm -rf $RPM_BUILD_ROOT
 
 %(for kernel in %{kernel_versions}; do echo -e "\
 %post -n %{module_name}-kernel-${kernel}\n\

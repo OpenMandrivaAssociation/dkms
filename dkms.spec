@@ -3,7 +3,7 @@ Name:		dkms
 Version:	2.2.0.3
 URL:		http://linux.dell.com/dkms
 Release: 	1
-License:	GPL
+License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
 Suggests:	kernel-devel
@@ -14,7 +14,7 @@ Requires:	patch
 Requires:	sed
 Requires:	gawk
 Source0:	http://linux.dell.com/dkms/%{name}-%{version}.tar.gz
-Source1:	template-dkms-mkrpm.spec.src
+Source1:	dkms-mkrpm.spec.template
 Source2:	dkms.depmod.conf
 Source3:	autoload.awk
 Patch1:		dkms-2.0.19-norpm.patch
@@ -45,15 +45,15 @@ Computer Corporation.
 This package is intended for building binary kernel
 modules with dkms source packages installed
 
-%package minimal
+%package	minimal
 Summary:	Dynamic Kernel Module Support Framework - minimal package
-License:	GPL
+License:	GPLv+2
 Group:		System/Base
 Requires:	lsb-release
-Requires(preun):	rpm-helper
+Requires(preun):rpm-helper
 Requires(post):	rpm-helper
 
-%description minimal
+%description	minimal
 This package contains the framework for the Dynamic
 Kernel Module Support (DKMS) method for installing
 module RPMS as originally developed by the Dell
@@ -64,17 +64,17 @@ as created by dkms.
 
 %prep
 %setup -q
-%patch2 -p1 -b .mdkize
-%patch4 -p1 -b .compressed-module
-%patch7 -p1 -b .procconfig
-%patch8 -p1 -b .mdkrpm-split-ver-rel
-%patch10 -p1 -b .binary_only
-%patch11 -p1 -b .min-max-kernel
-%patch17 -p1 -b .autoalias
-%patch18 -p1 -b .mkrpm
-%patch21 -p1 -b .mdv-interactive
-%patch22 -p1 -b .symvers
-%patch24 -p1 -b .generic-prepare
+%patch2 -p1 -b .mdkize~
+%patch4 -p1 -b .compressed-module~
+%patch7 -p1 -b .procconfig~
+%patch8 -p1 -b .mdkrpm-split-ver-rel~
+%patch10 -p1 -b .binary_only~
+%patch11 -p1 -b .min-max-kernel~
+%patch17 -p1 -b .autoalias~
+%patch18 -p1 -b .mkrpm~
+%patch21 -p1 -b .mdv-interactive~
+%patch22 -p1 -b .symvers~
+%patch24 -p1 -b .generic-prepare~
 %patch25 -p1 -b .suggests-devel~
 %patch26 -p1 -b .xz_support~
 
@@ -86,10 +86,16 @@ sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{nam
   dkms
 
 %install
-mkdir -p %{buildroot}%{_mandir}/man8
-%makeinstall_std INITD=%{buildroot}%{_initrddir}
+%makeinstall_std INITD=%{buildroot}%{_initrddir} \
+		       SBIN=%{buildroot}%{_sbindir} \
+		       VAR=%{buildroot}%{_localstatedir}/lib/%{name} \
+		       MAN=%{buildroot}%{_mandir}/man8 \
+		       ETC=%{buildroot}%{_sysconfdir}/%{name} \
+		       BASHDIR=%{buildroot}%{_sysconfdir}/bash_completion.d \
+		       LIBDIR=%{buildroot}%{_prefix}/lib/%{name}
+
 install -m644 %{SOURCE1} -D %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.spec
-install -m755 dkms_mkkerneldoth -D %{buildroot}/%{_sbindir}/dkms_mkkerneldoth
+install -m755 dkms_mkkerneldoth -D %{buildroot}%{_sbindir}/dkms_mkkerneldoth
 mv %{buildroot}%{_prefix}/lib/%{name}/dkms_autoinstaller %{buildroot}%{_sbindir}
 install -m755 %{SOURCE3} %{buildroot}%{_sbindir}/dkms_autoload
 mkdir -p %{buildroot}%{_dkmsbinarydir}
@@ -99,7 +105,7 @@ install -m644 %{SOURCE2} -D %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
 rm -f /etc/rc.d/*/{K,S}??dkms
 
 %files
-%doc %attr (-,root,root) sample.spec sample.conf AUTHORS COPYING template-dkms-mkrpm.spec 
+%doc sample.spec sample.conf AUTHORS template-dkms-mkrpm.spec 
 %{_sbindir}/dkms_autoinstaller
 
 %files minimal
@@ -117,8 +123,3 @@ rm -f /etc/rc.d/*/{K,S}??dkms
 %{_sysconfdir}/kernel/prerm.d/%{name}
 %{_sysconfdir}/bash_completion.d/%{name}
 %{_sysconfdir}/depmod.d/%{name}.conf
-
-
-
-
-
