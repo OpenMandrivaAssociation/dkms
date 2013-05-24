@@ -87,12 +87,12 @@ sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{nam
 
 %install
 %makeinstall_std INITD=%{buildroot}%{_initrddir} \
-		       SBIN=%{buildroot}%{_sbindir} \
-		       VAR=%{buildroot}%{_localstatedir}/lib/%{name} \
-		       MAN=%{buildroot}%{_mandir}/man8 \
-		       ETC=%{buildroot}%{_sysconfdir}/%{name} \
-		       BASHDIR=%{buildroot}%{_sysconfdir}/bash_completion.d \
-		       LIBDIR=%{buildroot}%{_prefix}/lib/%{name}
+		 SBIN=%{buildroot}%{_sbindir} \
+		 VAR=%{buildroot}%{_localstatedir}/lib/%{name} \
+		 MAN=%{buildroot}%{_mandir}/man8 \
+		 ETC=%{buildroot}%{_sysconfdir}/%{name} \
+		 BASHDIR=%{buildroot}%{_sysconfdir}/bash_completion.d \
+		 LIBDIR=%{buildroot}%{_prefix}/lib/%{name}
 
 install -m644 %{SOURCE1} -D %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.spec
 install -m755 dkms_mkkerneldoth -D %{buildroot}%{_sbindir}/dkms_mkkerneldoth

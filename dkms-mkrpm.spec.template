@@ -59,11 +59,11 @@ built for the ${kernel} kernel."\
 %package -n	%{module_name}-kernel-$kflavour-latest\n\
 Summary:	%{module_name} driver for latest kernel-${kflavour} \n\
 Version:	%{version} \n\
-Vendor:		%{vednor} \n\
-Release:	1.%{latest_date}.%{rel} \n\
+Vendor:		%{vendor} \n\
+Release:	1.%{latest_date}.%{release} \n\
 License:	%{license} \n\
 Group:		System/Kernel and hardware\n\
-Requires:	%{module_name}-kernel-$kernel = %{version}-%{rel} \n\
+Requires:	%{module_name}-kernel-$kernel = %{version}-%{release} \n\
 \n\
 %description -n %{module_name}-kernel-${kflavour}-latest\n\
 dkms binary kernel modules for the %{module_name} driver version %{version},\n\
@@ -100,7 +100,7 @@ dkms uninstall --binary -m %{module_name} -v %{fake_version} -k ${kernel} --rpm_
 ";done)
 
 %(for kernel in %kernels_latest; do kflavour=`%kernel_flavour_cmd $kernel`; echo -e "\
-%files -n %{module_name}-kernel-$kflavour-latest\n%defattr(-,root,root)\n\
+%files -n %{module_name}-kernel-$kflavour-latest\n\
 ";done)
 
 %changelog
