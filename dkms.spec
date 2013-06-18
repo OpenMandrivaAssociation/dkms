@@ -1,8 +1,8 @@
 Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
-Version:	2.2.0.3
+Version:	2.2.0.3.1
 URL:		http://linux.dell.com/dkms
-Release:	2
+Release:	1
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
@@ -13,7 +13,8 @@ Requires(post):	rpm-helper
 Requires:	patch
 Requires:	sed
 Requires:	gawk
-Source0:	http://linux.dell.com/dkms/permalink/%{name}-%{version}.tar.gz
+# unofficial version, from latest git 
+Source0:	http://linux.dell.com/dkms/permalink/%{name}-%{version}.tar.xz
 Source1:	dkms-mkrpm.spec.template
 Source2:	dkms.depmod.conf
 Source3:	autoload.awk
@@ -30,7 +31,7 @@ Patch21:	dkms-2.2.0.3-init-mdv-interactive.patch
 Patch22:	dkms-2.2.0.3-symvers.patch
 Patch24:	dkms-2.2.0.3-generic-preparation-for-2.6.39-and-higher.patch
 Patch25:	dkms-2.2.0.3-suggest-devel-not-source.patch
-Patch26:	dkms-2.2.0.3-xz-support.patch
+Patch26:	dkms-2.2.0.3.1-xz-support.patch
 Patch27:	dkms-2.2.0.3-parallel-build.patch
 
 
