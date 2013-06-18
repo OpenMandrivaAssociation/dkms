@@ -2,7 +2,7 @@ Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
 Version:	2.2.0.3
 URL:		http://linux.dell.com/dkms
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
@@ -31,6 +31,7 @@ Patch22:	dkms-2.2.0.3-symvers.patch
 Patch24:	dkms-2.2.0.3-generic-preparation-for-2.6.39-and-higher.patch
 Patch25:	dkms-2.2.0.3-suggest-devel-not-source.patch
 Patch26:	dkms-2.2.0.3-xz-support.patch
+Patch27:	dkms-2.2.0.3-parallel-build.patch
 
 
 %define _dkmsdir %{_localstatedir}/lib/%{name}
@@ -77,6 +78,7 @@ as created by dkms.
 %patch24 -p1 -b .generic-prepare~
 %patch25 -p1 -b .suggests-devel~
 %patch26 -p1 -b .xz_support~
+%patch27 -p1 -b .parallel~
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
