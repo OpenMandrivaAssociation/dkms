@@ -1,8 +1,10 @@
+%define __noautoreq '.*/bin/awk|.*/bin/gawk'
+
 Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
 Version:	2.0.19
 URL:		http://linux.dell.com/dkms
-Release: 	31
+Release: 	32
 License:	GPL
 Group:		System/Base
 BuildArch:	noarch
@@ -57,6 +59,7 @@ modules with dkms source packages installed
 Summary:	Dynamic Kernel Module Support Framework - minimal package
 License:	GPL
 Group:		System/Base
+Requires:	gawk
 Requires:	lsb-release
 Requires(preun):	rpm-helper
 Requires(post):	rpm-helper
