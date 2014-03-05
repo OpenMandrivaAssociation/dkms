@@ -1,3 +1,5 @@
+%define __noautoreq '.*/bin/awk|.*/bin/gawk'
+
 Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
 Version:	2.2.0.3.1
@@ -49,8 +51,8 @@ modules with dkms source packages installed
 
 %package	minimal
 Summary:	Dynamic Kernel Module Support Framework - minimal package
-License:	GPLv2+
 Group:		System/Base
+Requires:	gawk
 Requires:	lsb-release
 Requires(preun):rpm-helper
 Requires(post):	rpm-helper
