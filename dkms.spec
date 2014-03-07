@@ -11,11 +11,11 @@ Group:		System/Base
 BuildArch:	noarch
 Suggests:	kernel-devel
 Requires:	%{name}-minimal = %{version}-%{release}
-Requires(pre):	rpm-helper
-Requires(post):	rpm-helper
 Requires:	patch
 Requires:	sed
 Requires:	gawk
+Requires:	lsb-release
+%rename		%{name}-minimal
 # unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
 Source0:	http://linux.dell.com/dkms/permalink/%{name}-%{version}.tar.xz
 Source1:	dkms-mkrpm.spec.template
@@ -59,23 +59,6 @@ Computer Corporation.
 This package is intended for building binary kernel
 modules with dkms source packages installed
 
-%package	minimal
-Summary:	Dynamic Kernel Module Support Framework - minimal package
-Group:		System/Base
-Requires:	gawk
-Requires:	lsb-release
-Requires(preun):rpm-helper
-Requires(post):	rpm-helper
-
-%description	minimal
-This package contains the framework for the Dynamic
-Kernel Module Support (DKMS) method for installing
-module RPMS as originally developed by the Dell
-Computer Corporation.
-
-This package is intended for installing binary module RPMS
-as created by dkms.
-
 %prep
 %setup -q
 %patch2 -p1 -b .mdkize~
@@ -101,13 +84,6 @@ as created by dkms.
 %patch34 -p1 -b .resetdeps~
 %patch35 -p1 -b .dontfail~
 
-sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
-  dkms_autoinstaller \
-  dkms_framework.conf \
-  kernel_*.d_dkms \
-  %{name}.8 \
-  dkms
-
 %install
 %makeinstall_std INITD=%{buildroot}%{_initrddir} \
 		 SBIN=%{buildroot}%{_sbindir} \
@@ -119,7 +95,7 @@ sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{nam
 
 install -m644 -p %{SOURCE1} -D %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.spec
 install -m755 -p dkms_mkkerneldoth -D %{buildroot}%{_sbindir}/dkms_mkkerneldoth
-mv %{buildroot}%{_prefix}/lib/%{name}/dkms_autoinstaller %{buildroot}%{_sbindir}
+rm %{buildroot}%{_prefix}/lib/%{name}/dkms_autoinstaller
 install -m755 -p %{SOURCE3} %{buildroot}%{_sbindir}/dkms_autoload
 mkdir -p %{buildroot}%{_dkmsbinarydir}
 install -m644 -p %{SOURCE2} -D %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
@@ -130,10 +106,7 @@ rm -f /etc/rc.d/*/{K,S}??dkms
 
 %files
 %doc sample.spec sample.conf AUTHORS template-dkms-mkrpm.spec 
-%{_sbindir}/dkms_autoinstaller
 %{_unitdir}/%{name}.service
-
-%files minimal
 %{_sbindir}/dkms
 %{_dkmsdir}
 %dir %{_dkmsbinarydir}
