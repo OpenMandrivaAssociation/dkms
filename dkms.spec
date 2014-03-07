@@ -21,6 +21,8 @@ Source0:	http://linux.dell.com/dkms/permalink/%{name}-%{version}.tar.xz
 Source1:	dkms-mkrpm.spec.template
 Source2:	dkms.depmod.conf
 Source3:	autoload.awk
+Source4:	dkms.service
+
 Patch1:		dkms-2.0.19-norpm.patch
 Patch2:		dkms-2.2.0.3-mdkize.patch
 Patch4:		dkms-2.2.0.3-compressed-module.patch
@@ -36,6 +38,13 @@ Patch24:	dkms-2.2.0.3-generic-preparation-for-2.6.39-and-higher.patch
 Patch25:	dkms-2.2.0.3-suggest-devel-not-source.patch
 Patch26:	dkms-2.2.0.3.1-xz-support.patch
 Patch27:	dkms-2.2.0.3-parallel-build.patch
+Patch28:	dkms-man.patch
+Patch29:	dkms-cleanup-after-removal.patch
+Patch30:	dkms-do-not-fail-on-modules-dir.patch
+Patch31:	dkms-use-STRIP-0-as-the-default-for-the-STRIP-array.patch
+Patch32:	dkms-2.2.0.3.1-add-dependency-logic-for-automatic-builds.patch
+Patch33:	dkms-fix-zfs-autoinstall-failures-for-kernel-upgrades.patch
+Patch34:	dkms-reset-build-dependencies.patch
 
 
 %define _dkmsdir %{_localstatedir}/lib/%{name}
@@ -83,6 +92,13 @@ as created by dkms.
 %patch25 -p1 -b .suggests-devel~
 %patch26 -p1 -b .xz_support~
 %patch27 -p1 -b .parallel~
+%patch28 -p1 -b .man~
+%patch29 -p1 -b .cleanup~
+%patch30 -p1 -b .nofail~
+%patch31 -p1 -b .strip0~
+%patch32 -p1 -b .autodeplogic~
+%patch33 -p1 -b .zfs~
+%patch34 -p1 -b .resetdeps~
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
@@ -100,12 +116,13 @@ sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{nam
 		 BASHDIR=%{buildroot}%{_sysconfdir}/bash_completion.d \
 		 LIBDIR=%{buildroot}%{_prefix}/lib/%{name}
 
-install -m644 %{SOURCE1} -D %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.spec
-install -m755 dkms_mkkerneldoth -D %{buildroot}%{_sbindir}/dkms_mkkerneldoth
+install -m644 -p %{SOURCE1} -D %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.spec
+install -m755 -p dkms_mkkerneldoth -D %{buildroot}%{_sbindir}/dkms_mkkerneldoth
 mv %{buildroot}%{_prefix}/lib/%{name}/dkms_autoinstaller %{buildroot}%{_sbindir}
-install -m755 %{SOURCE3} %{buildroot}%{_sbindir}/dkms_autoload
+install -m755 -p %{SOURCE3} %{buildroot}%{_sbindir}/dkms_autoload
 mkdir -p %{buildroot}%{_dkmsbinarydir}
-install -m644 %{SOURCE2} -D %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
+install -m644 -p %{SOURCE2} -D %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
+install -m644 -p %{SOURCE4} -D %{buildroot}%{_unitdir}/%{name}.service
 
 %triggerpostun -- dkms < 2.0.19-11
 rm -f /etc/rc.d/*/{K,S}??dkms
@@ -113,6 +130,7 @@ rm -f /etc/rc.d/*/{K,S}??dkms
 %files
 %doc sample.spec sample.conf AUTHORS template-dkms-mkrpm.spec 
 %{_sbindir}/dkms_autoinstaller
+%{_unitdir}/%{name}.service
 
 %files minimal
 %{_sbindir}/dkms
