@@ -45,7 +45,7 @@ Patch31:	dkms-use-STRIP-0-as-the-default-for-the-STRIP-array.patch
 Patch32:	dkms-2.2.0.3.1-add-dependency-logic-for-automatic-builds.patch
 Patch33:	dkms-fix-zfs-autoinstall-failures-for-kernel-upgrades.patch
 Patch34:	dkms-reset-build-dependencies.patch
-
+Patch35:	dkms-2.2.0.3-dont_fail_if_module_source_removed.patch
 
 %define _dkmsdir %{_localstatedir}/lib/%{name}
 %define _dkmsbinarydir %{_localstatedir}/lib/%{name}-binary
@@ -99,6 +99,7 @@ as created by dkms.
 %patch32 -p1 -b .autodeplogic~
 %patch33 -p1 -b .zfs~
 %patch34 -p1 -b .resetdeps~
+%patch35 -p1 -b .dontfail~
 
 sed -i -e 's,/var/%{name},%{_dkmsdir},g;s,init.d/dkms_autoinstaller,init.d/%{name},g' \
   dkms_autoinstaller \
