@@ -101,6 +101,10 @@ mkdir -p %{buildroot}%{_dkmsbinarydir}
 install -m644 -p %{SOURCE2} -D %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
 install -m644 -p %{SOURCE4} -D %{buildroot}%{_unitdir}/%{name}.service
 
+%if %{disttag} == "omv"
+sed -i -e 's/moondrake/OpenMandriva/gI' %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.spec
+%endif
+
 %triggerpostun -- dkms < 2.0.19-11
 rm -f /etc/rc.d/*/{K,S}??dkms
 
