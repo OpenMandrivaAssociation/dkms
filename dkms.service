@@ -1,0 +1,13 @@
+[Unit]
+Description=Builds and install new kernel modules through DKMS
+DefaultDependencies=no
+Conflicts=shutdown.target
+After=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/sbin/dkms_autoinstaller start
+
+[Install]
+WantedBy=multi-user.target

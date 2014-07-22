@@ -4,7 +4,7 @@ Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
 Version:	2.0.19
 URL:		http://linux.dell.com/dkms
-Release: 	33
+Release: 	34
 License:	GPL
 Group:		System/Base
 BuildArch:	noarch
@@ -19,6 +19,7 @@ Source:		http://linux.dell.com/dkms/%{name}-%{version}.tar.gz
 Source1:	template-dkms-mkrpm.spec.src
 Source2:	dkms.depmod.conf
 Source3:	autoload.awk
+Source4:	dkms.service
 Patch1:		dkms-2.0.19-norpm.patch
 Patch2:		dkms-2.0.17.5-mdkize.patch
 Patch3:		dkms-fix-kernel-make-prepare.patch
@@ -63,6 +64,8 @@ Requires:	gawk
 Requires:	lsb-release
 Requires(preun):	rpm-helper
 Requires(post):	rpm-helper
+# dkms call is not a part of mandrake_everytime script anymore
+Conflicts:	initscripts < 9.53-1.3
 
 %description minimal
 This package contains the framework for the Dynamic
@@ -116,6 +119,7 @@ mv %{buildroot}%{_initrddir}/dkms_autoinstaller %{buildroot}%{_sbindir}
 mkdir -p %{buildroot}%{_dkmsbinarydir}
 mkdir -p %{buildroot}%{_sysconfdir}/depmod.d
 install -m644 %{SOURCE2} %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
+install -m644 -p %{SOURCE4} -D %{buildroot}%{_unitdir}/%{name}.service
 
 %triggerpostun -- dkms < 2.0.19-11
 rm -f /etc/rc.d/*/{K,S}??dkms
@@ -128,6 +132,7 @@ rm -f /etc/rc.d/*/{K,S}??dkms
 %{_sbindir}/dkms
 %{_dkmsdir}
 %dir %{_dkmsbinarydir}
+%{_unitdir}/%{name}.service
 %{_sbindir}/dkms_mkkerneldoth
 %{_sbindir}/dkms_autoload
 %{_mandir}/man8/dkms.8*
@@ -137,8 +142,3 @@ rm -f /etc/rc.d/*/{K,S}??dkms
 %{_sysconfdir}/kernel/prerm.d/%{name}
 %{_sysconfdir}/bash_completion.d/%{name}
 %{_sysconfdir}/depmod.d/%{name}.conf
-
-
-
-
-
