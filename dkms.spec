@@ -5,7 +5,7 @@ Name:		dkms
 Version:	2.2.0.3.1
 URL:		http://linux.dell.com/dkms
 %define	gitdate	20130827
-Release:	2.%{gitdate}.1
+Release:	3.%{gitdate}.1
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
@@ -107,6 +107,15 @@ sed -i -e 's/moondrake/OpenMandriva/gI' %{buildroot}%{_sysconfdir}/%{name}/templ
 
 %triggerpostun -- dkms < 2.0.19-11
 rm -f /etc/rc.d/*/{K,S}??dkms
+
+%post
+%systemd_post dkms.service
+
+%postun
+%systemd_postun dkms.service
+
+%preun
+%systemd_preun dkms.service
 
 %files
 %doc sample.spec sample.conf AUTHORS template-dkms-mkrpm.spec 
