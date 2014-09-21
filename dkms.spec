@@ -4,7 +4,7 @@ Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
 Version:	2.0.19
 URL:		http://linux.dell.com/dkms
-Release: 	34
+Release: 	34.1
 License:	GPL
 Group:		System/Base
 BuildArch:	noarch
@@ -123,6 +123,15 @@ install -m644 -p %{SOURCE4} -D %{buildroot}%{_unitdir}/%{name}.service
 
 %triggerpostun -- dkms < 2.0.19-11
 rm -f /etc/rc.d/*/{K,S}??dkms
+
+%post
+%systemd_post dkms.service
+
+%postun
+%systemd_postun dkms.service
+
+%preun
+%systemd_preun dkms.service
 
 %files
 %doc %attr (-,root,root) sample.spec sample.conf AUTHORS COPYING template-dkms-mkrpm.spec 
