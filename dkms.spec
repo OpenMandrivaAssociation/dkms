@@ -5,7 +5,7 @@ Name:		dkms
 Version:	2.2.0.3.1
 URL:		http://linux.dell.com/dkms
 %define	gitdate	20130827
-Release:	3.%{gitdate}.2
+Release:	3.%{gitdate}.3
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
