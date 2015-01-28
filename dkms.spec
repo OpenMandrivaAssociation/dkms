@@ -5,7 +5,7 @@ Name:		dkms
 Version:	2.2.0.3.1
 URL:		http://linux.dell.com/dkms
 %define	gitdate	20130827
-Release:	3.%{gitdate}.3
+Release:	3.%{gitdate}.4
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
@@ -17,6 +17,7 @@ Requires:	gawk
 Requires:	lsb-release
 Requires:	gcc
 Requires:	gcc-cpp
+Requires:	make
 %rename		%{name}-minimal
 # unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
 Source0:	http://linux.dell.com/dkms/permalink/%{name}-%{version}.tar.xz
