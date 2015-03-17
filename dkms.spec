@@ -5,18 +5,18 @@ Name:		dkms
 Version:	2.2.0.3.1
 URL:		http://linux.dell.com/dkms
 %define	gitdate	20130827
-Release:	3.%{gitdate}.5
+Release:	3.%{gitdate}.6
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
 Suggests:	kernel-devel
-Requires(post,postun,preun):	patch
-Requires(post,postun,preun):	sed
-Requires(post,postun,preun):	gawk
-Requires(post,postun,preun):	lsb-release
-Requires(post,postun,preun):	gcc
-Requires(post,postun,preun):	gcc-cpp
-Requires(post,postun,preun):	make
+Requires:	patch
+Requires:	sed
+Requires:	gawk
+Requires:	lsb-release
+Requires:	gcc
+Requires:	gcc-cpp
+Requires:	make
 %rename		%{name}-minimal
 # unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
 Source0:	http://linux.dell.com/dkms/permalink/%{name}-%{version}.tar.xz
@@ -110,14 +110,6 @@ sed -i -e 's/moondrake/OpenMandriva/gI' %{buildroot}%{_sysconfdir}/%{name}/templ
 %triggerpostun -- dkms < 2.0.19-11
 rm -f /etc/rc.d/*/{K,S}??dkms
 
-%post
-%systemd_post dkms.service
-
-%postun
-%systemd_postun dkms.service
-
-%preun
-%systemd_preun dkms.service
 
 %files
 %doc sample.spec sample.conf AUTHORS template-dkms-mkrpm.spec 
