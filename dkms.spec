@@ -5,18 +5,19 @@ Name:		dkms
 Version:	2.2.0.3.1
 URL:		http://linux.dell.com/dkms
 %define	gitdate	20130827
-Release:	3.%{gitdate}.6
+Release:	3.%{gitdate}.7
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
 Suggests:	kernel-devel
-Requires:	patch
-Requires:	sed
-Requires:	gawk
-Requires:	lsb-release
-Requires:	gcc
-Requires:	gcc-cpp
-Requires:	make
+# (tpg) these are needed before dkms.service starts
+Requires(pre):	patch
+Requires(pre):	sed
+Requires(pre):	gawk
+Requires(pre):	lsb-release
+Requires(pre):	gcc
+Requires(pre):	gcc-cpp
+Requires(pre):	make
 %rename		%{name}-minimal
 # unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
 Source0:	http://linux.dell.com/dkms/permalink/%{name}-%{version}.tar.xz
@@ -110,6 +111,8 @@ sed -i -e 's/moondrake/OpenMandriva/gI' %{buildroot}%{_sysconfdir}/%{name}/templ
 %triggerpostun -- dkms < 2.0.19-11
 rm -f /etc/rc.d/*/{K,S}??dkms
 
+%pre
+echo "Preinstalling packages"
 
 %files
 %doc sample.spec sample.conf AUTHORS template-dkms-mkrpm.spec 
