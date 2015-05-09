@@ -1,0 +1,29 @@
+--- dkms-2.2.0.3/dkms.min-max-kernel	2013-05-24 22:04:24.594293260 +0200
++++ dkms-2.2.0.3/dkms	2013-05-24 22:07:42.986072743 +0200
+@@ -25,6 +25,7 @@
+ readonly dkms_conf_variables="CLEAN REMAKE_INITRD remake_initrd PACKAGE_NAME
+        PACKAGE_VERSION POST_ADD POST_INSTALL POST_REMOVE PRE_BUILD
+        PRE_INSTALL BUILD_EXCLUSIVE_KERNEL BUILD_EXCLUSIVE_ARCH
++       BUILD_MIN_KERNEL BUILD_MAX_KERNEL
+        build_exclude OBSOLETE_BY MAKE MAKE_MATCH MODULES_CONF
+        modules_conf_array PATCH PATCH_MATCH patch_array BUILT_MODULE_NAME
+        built_module_name BUILT_MODULE_LOCATION built_module_location
+@@ -618,10 +619,16 @@ read_conf()
+ 
+     # Set build_exclude
+     [[ $BUILD_EXCLUSIVE_KERNEL && ! $1 =~ $BUILD_EXCLUSIVE_KERNEL ]] && \
+-       build_exclude="yes"
++       build_exclude="kernel does not match BUILD_EXCLUSIVE_KERNEL directive"
+     [[ $BUILD_EXCLUSIVE_ARCH && ! $2 =~ $BUILD_EXCLUSIVE_ARCH ]] && \
+-	build_exclude="yes"
++	build_exclude="kernel does not match BUILD_EXCLUSIVE_KERNEL directive"
+ 
++    if [ -n "$BUILD_MIN_KERNEL" ]; then
++	[[ $(VER $1) > $(VER $BUILD_MIN_KERNEL) ]] || build_exclude="kernel version is inferior to BUILD_MIN_KERNEL directive"
++    fi
++    if [ -n "$BUILD_MAX_KERNEL" ]; then
++	[[ $(VER $1) < $(VER $BUILD_MAX_KERNEL) ]] || build_exclude="kernel version is superior to BUILD_MAX_KERNEL directive"
++    fi
+     # Fail if absolutely no DEST_MODULE_LOCATION
+     if ((${#dest_module_location[@]} == 0)); then
+ 	echo $"dkms.conf: Error! No 'DEST_MODULE_LOCATION' directive specified." >&2

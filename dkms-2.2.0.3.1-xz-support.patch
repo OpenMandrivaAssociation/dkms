@@ -1,0 +1,84 @@
+--- dkms-2.2.0.3.1/dkms_find-provides.xz_support~	2013-06-18 03:54:55.000000000 +0200
++++ dkms-2.2.0.3.1/dkms_find-provides	2013-06-18 03:57:26.356920066 +0200
+@@ -64,7 +64,7 @@ TMPDIR=$(mktemp -d ${tmp}/dkms-findprovi
+ trap "rm -rf $TMPDIR >/dev/null 2>&1"  QUIT EXIT HUP INT TERM
+ 
+ modlist=
+-for cand in $(grep -E '(/lib/modules/.+\.ko$|tgz$|tbz$|tar\.(gz|bz2)$)') $*; do
++for cand in $(grep -E '(/lib/modules/.+\.ko$|tgz$|tbz$|tar\.(gz|bz2|xz)$)') $*; do
+     if echo $cand | grep -q -E '/lib/modules/.+\.ko$' > /dev/null 2>&1; then
+         modlist="$modlist $cand"
+     fi
+@@ -76,6 +76,8 @@ for cand in $(grep -E '(/lib/modules/.+\
+         opts=${opts}z
+     elif bzip2 -t $cand >/dev/null 2>&1; then
+         opts=${opts}j
++    elif xz -t $cand >/dev/null 2>&1; then
++        opts=${opts}J
+     fi
+     tar ${opts}f $cand -C $TMPDIR > /dev/null 2>&1
+ done
+--- dkms-2.2.0.3.1/dkms.xz_support~	2013-06-18 03:57:26.352920033 +0200
++++ dkms-2.2.0.3.1/dkms	2013-06-18 04:06:10.756125866 +0200
+@@ -159,7 +159,10 @@ set_module_suffix()
+     grep -q '\.gz:' /lib/modules/$kernel_test/modules.dep 2>/dev/null && gz_modules=1
+     if [ -n "$gz_modules" ]; then
+ 	[ -z "$delayed_gzip" ] && module_suffix=${module_suffix}.gz
+-   fi
++    fi
++    if [ -n "$xz_modules" ]; then
++	module_suffix=${module_suffix}.xz
++    fi
+ }
+ 
+ set_kernel_source_dir()
+@@ -253,6 +256,10 @@ do_depmod()
+     else
+ 	depmod -a "$1"
+     fi
++    grep -q '\.xz:' /lib/modules/$kernel_test/modules.dep 2>/dev/null && xz_modules=1
++    if [ -n "$xz_modules" ]; then
++	[ -z "$delayed_xz" ] && module_suffix=${module_suffix}.xz
++    fi
+ }
+ 
+ # This function is a little hairy -- every distro has slightly different tools
+@@ -1318,6 +1325,10 @@ do_build()
+ 	if [ -n "$gz_modules" ]; then
+ 	    gzip -9f $dkms_tree/$module/$module_version/${kernelver_array[0]}/${arch_array[0]}/module/${dest_module_name[$count]}$module_suffix
+ 	fi
++	if [ -n "$xz_modules" ]; then
++	    xz -f $dkms_tree/$module/$module_version/${kernelver_array[0]}/${arch_array[0]}/module/${dest_module_name[$count]}$module_suffix
++	fi
++
+     # Run the post_build script
+     run_build_script post_build "$post_build"
+ }
+@@ -2644,7 +2655,7 @@ load_tarball()
+        fi
+     fi
+ 
+-    # Figure out what kind of archive it is (tar.gz, tar, tar.bz, etc)
++    # Figure out what kind of archive it is (tar.gz, tar, tar.bz, tar.xz. etc)
+     # Note that this does not depend on the extensions being correct.
+     local tar_options=""
+     for xpand in gzip bzip xz; do
+@@ -2858,6 +2869,9 @@ make_rpm()
+ 	die 1 $"rpmbuild not present." \
+ 	    $"Install the rpm-build package."
+     fi
++    if `xz -t $archive_location 2>/dev/null`; then
++	tar_options="${tar_options}J"
++    fi
+ 
+     # Read the conf file
+     read_conf_or_die "$kernelver" "$arch"
+@@ -3639,7 +3653,7 @@ for action_to_run in $action; do
+ 	match)        check_root && have_one_kernel && run_match;;
+ 	uninstall)    check_root && have_one_kernel && uninstall_module;;
+ 	mkdriverdisk) check_root && make_driver_disk;;
+-	build)        delayed_gzip=1 && build_modules;;
++	build)        delayed_xz=1 && delayed_gzip=1 && build_modules;;
+ 	add)          add_module;;
+ 	mktarball)    make_tarball;;
+ 	mkrpm)        make_rpm;;

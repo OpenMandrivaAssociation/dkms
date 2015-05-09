@@ -1,0 +1,55 @@
+--- dkms-2.2.0.3/dkms.procconfig	2013-05-24 20:50:25.483659867 +0200
++++ dkms-2.2.0.3/dkms	2013-05-24 20:51:47.062728908 +0200
+@@ -1067,13 +1067,20 @@ prepare_kernel()
+             else
+                 config_arch=$2
+             fi
+-	    for config_type in BOOT smp enterprise secure i586-up-1GB i686-up-4GB p3-smp-64GB desktop586 desktop laptop server; do
+-		[ `echo "$1" | grep "$config_type"` ] && kernel_config="$kernel_source_dir/arch/$config_arch/defconfig-$config_type"
+-		[ ! -e "$kernel_config" ] && kernel_config=""
+-	    done
+-	    [ -z "$kernel_config" ] && kernel_config="$kernel_source_dir/arch/$config_arch/defconfig"
+-	    [ ! -e "$kernel_config" ] && kernel_config=""
+ 	fi
++	    if [ "$1" == `uname -r` ] && [ -e "/proc/config.gz" ]; then
++		kernel_config="/proc/config.gz"
++   	    elif [ -e "/boot/config-$1" ]; then 
++	        kernel_config="/boot/config-$1"
++            else
++	        for config_type in BOOT smp enterprise secure i586-up-1GB i686-up-4GB p3-smp-64GB desktop586 desktop laptop server; do
++		    [ `echo "$1" | grep "$config_type"` ] && kernel_config="$kernel_source_dir/arch/$config_arch/defconfig-$config_type"
++		    [ ! -e "$kernel_config" ] && kernel_config=""
++	        done
++	        [ -z "$kernel_config" ] && kernel_config="$kernel_source_dir/arch/$config_arch/defconfig"
++	        [ ! -e "$kernel_config" ] && kernel_config=""
++	    fi
++
+     elif [ -e /etc/redhat-release ] || [ -e /etc/fedora-release ]; then
+ 	# Note this also applies to VMware 3.x
+ 	if [[ -z $kernel_config && -d $kernel_source_dir/configs ]]; then
+@@ -1126,7 +1133,11 @@ prepare_kernel()
+ 
+ 	if [[ $kernel_config ]]; then
+ 	    echo $"using $kernel_config"
+-	    cp -f "$kernel_config" .config
++	    if file -b -i "$kernel_config" | grep -q "application/x-gzip"; then
++		    zcat "$kernel_config" > .config
++	    else
++		    cp -f "$kernel_config" .config
++	    fi
+ 	elif [[ -e .config ]]; then
+ 	    warn $"Using $kernel_source_dir/.config" \
+ 		$"(I hope this is the correct config for this kernel)"
+@@ -1152,7 +1163,11 @@ prepare_kernel()
+ 
+ 	if [[ $kernel_config ]]; then
+ 	    echo $"using $kernel_config"
+-	    cp -f "$kernel_config" .config
++	    if file -b -i "$kernel_config" | grep -q "application/x-gzip"; then
++		    zcat "$kernel_config" > .config
++	    else
++		    cp -f "$kernel_config" .config
++	    fi
+ 	elif [[ -e .config ]]; then
+ 	    warn $"using $kernel_source_dir/.config" \
+ 		$"(I hope this is the correct config for this kernel)"

@@ -27,22 +27,32 @@ BEGIN{
   }
 
   while ("udevadm info --export-db" | getline) {
-    if (! /^E: (PCI_CLASS|DRIVER|MODALIAS)/) { continue }
     # do not modprobe devices that already have a driver
     if (/^E: DRIVER=./) { skip=1; continue }
     if (/^E: PCI_CLASS=3....$/) { disp=1; continue }
-    if (/^E: MODALIAS=/ && skip) { skip=0; disp=0; continue }
 
     # modprobe existing device aliases ($2) provided by the given modules
-    if (/^E: MODALIAS=/) {
-      for (modalias in modaliases)
-        if ($2 ~ modalias)
-          if (disp) {
-            system("display_driver_helper --load-dkms-autoload \""ARGV[1]"\" \""$2"\"")
-          } else {
-            system("modprobe --use-blacklist \""$2"\"")
-          }
+    if (/^E: MODALIAS=/ && !skip) {
+      for (modalias in modaliases) {
+        if ($2 ~ modalias) {
+          load=$2
+          break
+        }
+      }
+    }
+
+    # end of an entry
+    if (/^$/) {
+      if (load && !skip) {
+        if (disp) {
+          system("display_driver_helper --load-dkms-autoload \""ARGV[1]"\" \""load"\"")
+        } else {
+          system("modprobe --use-blacklist \""load"\"")
+        }
+      }
       disp=0
+      load=0
+      skip=0
     }
   }
 }

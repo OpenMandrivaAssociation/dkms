@@ -1,0 +1,204 @@
+--- dkms-2.2.0.3/dkms.mdkize	2011-12-07 19:23:58.000000000 +0100
++++ dkms-2.2.0.3/dkms	2013-05-24 20:35:08.833477108 +0200
+@@ -823,6 +823,16 @@ moduleconfig_add()
+ 	done
+     done
+ 
++    if [ -d /etc/modprobe.d ]; then
++	local index=0
++	while [ $index -lt ${#dest_module_name[@]} ]; do
++	    if [ "${modules_conf_extract_aliases[$index]}" = yes -a -f $install_tree/${kernelver_array[0]}${dest_module_location[$index]}/${dest_module_name[$index]}$module_suffix ]; then
++		modinfo $install_tree/${kernelver_array[0]}${dest_module_location[$index]}/${dest_module_name[$index]}$module_suffix | sed -n -e "s/alias:\(.*\)$/alias \1 ${dest_module_name[$index]}/p" > /etc/modprobe.d/dkms-aliases-${dest_module_name[$index]}
++	    fi
++	    index=$(($index+1))
++	done
++    fi
++
+     # Delete the temp dir
+     rm -rf $temp_dir_name
+ }
+@@ -1027,6 +1037,7 @@ prepare_kernel()
+     if [[ (! ( $(VER $1) < $(VER 2.6.5) ) || -d /etc/SuSEconfig) && \
+        -d "$kernel_source_dir" && \
+        -z "$ksourcedir_fromcli" ]]; then
++       ! -L "$kernel_source_dir" && \
+ 	echo $""
+ 	echo $"Kernel preparation unnecessary for this kernel.  Skipping..."
+ 	no_clean_kernel="no-clean-kernel"
+@@ -1044,7 +1055,22 @@ prepare_kernel()
+     }
+ 
+     # Set kernel_config
+-    if [[ -e /etc/redhat-release || -e /etc/fedora-release ]]; then
++    if [ -e /etc/mandriva-release ]; then
++	if [ -z "$kernel_config" ] && [ -d "$kernel_source_dir/arch" ]; then
++	    local kernel_trunc=`echo $1 | sed 's/-.*//'`
++            if [ "$2" == "i586" ] || [ "$2" == "i686" ]; then
++                config_arch="i386"
++            else
++                config_arch=$2
++            fi
++	    for config_type in BOOT smp enterprise secure i586-up-1GB i686-up-4GB p3-smp-64GB desktop586 desktop laptop server; do
++		[ `echo "$1" | grep "$config_type"` ] && kernel_config="$kernel_source_dir/arch/$config_arch/defconfig-$config_type"
++		[ ! -e "$kernel_config" ] && kernel_config=""
++	    done
++	    [ -z "$kernel_config" ] && kernel_config="$kernel_source_dir/arch/$config_arch/defconfig"
++	    [ ! -e "$kernel_config" ] && kernel_config=""
++	fi
++    elif [ -e /etc/redhat-release ] || [ -e /etc/fedora-release ]; then
+ 	# Note this also applies to VMware 3.x
+ 	if [[ -z $kernel_config && -d $kernel_source_dir/configs ]]; then
+ 	    local kernel_trunc=${1%%-*}
+@@ -1086,7 +1112,11 @@ prepare_kernel()
+ 	invoke_command "make KERNELRELEASE=$1 cloneconfig" "make cloneconfig" background
+ 	invoke_command "make CONFIG_MODVERSIONS=1 KERNELRELEASE=$1 dep" "make CONFIG_MODVERSIONS=1 dep" background
+     elif grep -q rhconfig.h $kernel_source_dir/include/linux/{modversions,version}.h 2>/dev/null; then
+-	echo $"Running Red Hat style preparation routine"
++ 	if [ -e /etc/mandriva-release ]; then
++ 	    echo $"Running Moondrake style preparation routine"
++ 	else
++ 	    echo $"Running Red Hat style preparation routine"
++ 	fi
+ 	invoke_command "make clean" "make clean" background
+ 	[[ $config_contents ]] && echo "$config_contents" > .config
+ 
+@@ -1132,7 +1162,7 @@ prepare_kernel()
+ 	if [[ $(VER $1) < $(VER 2.5) ]]; then
+ 	    invoke_command "make KERNELRELEASE=$1 dep" "make dep" background
+ 	else
+-	    invoke_command "make KERNELRELEASE=$1 prepare-all scripts" "make prepare-all" background
++	    invoke_command "make KERNELRELEASE=$1 prepare scripts" "make prepare" background
+ 	fi
+     fi
+     cd - >/dev/null
+@@ -3379,6 +3409,7 @@ no_clean_kernel=""
+ binaries_only=""
+ source_only=""
+ all=""
++binary=""
+ module_suffix=""
+ rpm_safe_upgrade=""
+ size="1440";
+--- dkms-2.2.0.3/dkms_mkkerneldoth.mdkize	2008-07-08 17:19:41.000000000 +0200
++++ dkms-2.2.0.3/dkms_mkkerneldoth	2013-05-24 20:32:17.898222189 +0200
+@@ -44,8 +44,8 @@ while [ $# -gt 0 ]; do
+ done
+ 
+ 
+-KERNEL_TYPE=`echo ${kernel_version} | sed 's_^.*\(BOOT\|smp\|enterprise\|bigmem\|hugemem\|debug\|vmnix\)$_-\1_;t;s_.*__;'`
+-KERNEL_RELEASE=`echo ${kernel_version} | sed 's|BOOT\|smp\|enterprise\|bigmem\|hugemem\|debug||g'`
++KERNEL_TYPE=`echo ${kernel_version} | sed 's_^.*\(desktop586\|desktop\|laptop\|server\|BOOT\|smp\|xen0\|legacy\|enterprise\|i586-up-1GB\|i686-up-4GB\|p3-smp-64GB\|secure\|bigmem\|hugemem\|debug\|vmnix\)$_-\1_;t;s_.*__;'`
++KERNEL_RELEASE=`echo ${kernel_version} | sed 's|desktop586\|desktop\|laptop\|server\|BOOT\|smp\|xen0\|legacy\|enterprise\|i586-up-1GB\|i686-up-4GB\|p3-smp-64GB\|secure\|bigmem\|hugemem\|debug||g'`
+ 
+ if [ -n "${target_arch}" ]; then
+     KERNEL_ARCH="${target_arch}"
+@@ -60,8 +60,15 @@ if [ -n "$KERNEL_ARCH" ]; then
+   BIGMEM='0'
+   HUGEMEM='0'
+   BOOT='0'
++  I586_UP_1GB='0'
++  I686_UP_4GB='0'
++  P3_SMP_64GB='0'
++  SECURE='0'
+   DEBUG='0'
+   VMNIX='0'
++  XEN0='0'
++  LEGACY='0'
++  DEFAULT='0'
+   case "$KERNEL_TYPE" in
+   -BOOT)
+ 	  BOOT='1'
+@@ -70,13 +77,86 @@ if [ -n "$KERNEL_ARCH" ]; then
+ 	  fi
+ 	  ;;
+   -smp) SMP='1';;
++  -xen0) XEN0='1';;
++  -legacy) LEGACY='1';;
+   -enterprise) ENTERPRISE='1';;
++  -i586-up-1GB) I586_UP_1GB='1';;
++  -i686-up-4GB) I686_UP_4GB='1';;
++  -p3-smp-64GB) P3_UP_64GB='1';;
++  -secure) SECURE='1';;
+   -bigmem) BIGMEM='1';;
+   -hugemem) HUGEMEM='1';;
+   -vmnix) VMNIX='1';;
+   *) UP='1';;
+   esac
+-  cat > ${output_file} << EOF
++
++  # since 2.6.17-2mdv, default kernels can be SMP enabled by
++  # default, hence a new name
++  mdk="md[kv]"
++  echo "$UP:${kernel_version}" | grep -q "^1:.*$mdk" && {
++    case ${kernel_version} in
++      # XXX simpler to maintain a skip list
++      [01].*|2.[0-5].*|2.6.[0-9]-*|2.6.1[0-6]-*|2.6.17-1mdk);;
++      *) UP=0; DEFAULT=1;;
++    esac
++  }
++
++  if [ -e /etc/mandriva-release ]; then
++    cat > ${output_file} << EOF
++/* This file is automatically generated at boot time. */
++#ifndef __BOOT_KERNEL_H_
++#define __BOOT_KERNEL_H_
++ 
++/* Kernel type $KERNEL_TYPE */
++
++#ifndef __BOOT_KERNEL_ENTERPRISE
++#define __BOOT_KERNEL_ENTERPRISE $ENTERPRISE
++#endif
++
++#ifndef __BOOT_KERNEL_SECURE
++#define __BOOT_KERNEL_SECURE $SECURE
++#endif
++ 
++#ifndef __BOOT_KERNEL_I586_UP_1GB
++#define __BOOT_KERNEL_I586_UP_1GB $I586_UP_1GB
++#endif
++ 
++#ifndef __BOOT_KERNEL_I686_UP_4GB
++#define __BOOT_KERNEL_I686_UP_4GB $I686_UP_4GB
++#endif
++ 
++#ifndef __BOOT_KERNEL_P3_SMP_4GB
++#define __BOOT_KERNEL_P3_SMP_4GB $P3_SMP_4GB
++#endif
++ 
++#ifndef __BOOT_KERNEL_SMP
++#define __BOOT_KERNEL_SMP $SMP
++#endif
++ 
++#ifndef __BOOT_KERNEL_UP
++#define __BOOT_KERNEL_UP $UP
++#endif
++ 
++#ifndef __BOOT_KERNEL_BOOT
++#define __BOOT_KERNEL_BOOT $BOOT
++#endif
++ 
++#ifndef __BOOT_KERNEL_LEGACY
++#define __BOOT_KERNEL_LEGACY $LEGACY
++#endif
++ 
++#ifndef __BOOT_KERNEL_DEFAULT
++#define __BOOT_KERNEL_DEFAULT $DEFAULT
++#endif
++ 
++#ifndef __BOOT_KERNEL_XEN0
++#define __BOOT_KERNEL_XEN0 $XEN0
++#endif
++ 
++#endif
++EOF
++  elif [ -e /etc/redhat-release ] || [ -e /etc/fedora-release ]; then
++    cat > ${output_file} << EOF
+ /* This file is automatically generated at boot time. */
+ #ifndef __BOOT_KERNEL_H_
+ #define __BOOT_KERNEL_H_
+@@ -120,4 +200,5 @@ if [ -n "$KERNEL_ARCH" ]; then
+ #endif
+ #endif
+ EOF
++  fi
+ fi

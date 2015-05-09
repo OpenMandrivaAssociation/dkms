@@ -1,13 +1,11 @@
 [Unit]
 Description=Builds and install new kernel modules through DKMS
-DefaultDependencies=no
-Conflicts=shutdown.target
-After=local-fs.target
+Documentation=man:dkms(8)
 
 [Service]
 Type=oneshot
 RemainAfterExit=true
-ExecStart=/usr/sbin/dkms_autoinstaller start
+ExecStart=/bin/sh -c 'dkms autoinstall --verbose --kernelver $(uname -r)'
 
 [Install]
 WantedBy=multi-user.target
