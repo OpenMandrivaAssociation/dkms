@@ -5,7 +5,7 @@ Name:		dkms
 Version:	2.2.0.3.1
 URL:		http://linux.dell.com/dkms
 %define	gitdate	20130827
-Release:	0.%{gitdate}.1
+Release:	0.%{gitdate}.2
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
@@ -18,6 +18,7 @@ Requires(pre):	lsb-release
 Requires(pre):	gcc
 Requires(pre):	gcc-cpp
 Requires(pre):	make
+Requires(post,postun):	systemd-units
 %rename		%{name}-minimal
 # unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
 Source0:	http://linux.dell.com/dkms/permalink/%{name}-%{version}.tar.xz
@@ -121,6 +122,9 @@ echo "Preinstalling packages"
 
 %post
 %systemd_post dkms.service
+# force it
+/bin/systemctl --quiet enable dkms.service 2>&1 || :
+/bin/systemctl --quiet try-restart dkms.service 2>&1 || :
 
 %postun
 %systemd_postun
