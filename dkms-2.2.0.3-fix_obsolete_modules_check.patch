@@ -1,0 +1,30 @@
+From 7a8f0cbfcf594c20e2bd2dfc4c1871aff93663e3 Mon Sep 17 00:00:00 2001
+From: Gaudenz Steinlin <gaudenz.steinlin@cirrax.com>
+Date: Mon, 18 Aug 2014 16:30:55 +0200
+Subject: Fix check for obsolete modules
+
+The check did not work as the array modules_conf_obsoletes array may
+contain elements even if there are no obsoleted modules. This is due to
+how the array is initialized. It's always as large as the largest of the
+configuration arrays defined in dkms.conf.
+
+This fix does a string comparison instead. If no osbsolete module is
+defined, then the expansion of the whole array to a string is always
+empty. For some reason [[ -n ${{modules_conf_obsoletes[@]} ]] does not
+work here.
+
+diff --git a/dkms b/dkms
+index 12c6318..883a650 100644
+--- a/dkms
++++ b/dkms
+@@ -751,7 +751,7 @@ moduleconfig_update_obsoletes()
+ {
+     # $@ = files to process
+     # do nothing if we have no obsoletes
+-    [[ ${modules_conf_obsoletes[@]} ]] || return 0
++    [[ "${modules_conf_obsoletes[@]}" == "" ]] || return 0
+     # generate sed args to remove obsolete modules
+     local mod_diff
+     for ((index=0; index < ${#dest_module_name[@]}; index++)); do
+-- 
+cgit v0.10
