@@ -57,6 +57,7 @@ Patch32:	dkms-2.2.0.3.1-add-dependency-logic-for-automatic-builds.patch
 Patch33:	dkms-fix-zfs-autoinstall-failures-for-kernel-upgrades.patch
 Patch34:	dkms-reset-build-dependencies.patch
 Patch35:	dkms-2.2.0.3-dont_fail_if_module_source_removed.patch
+Patch36:	dkms-2.2.0.3-fix_obsolete_modules_check.patch
 
 %define _dkmsdir %{_localstatedir}/lib/%{name}
 %define _dkmsbinarydir %{_localstatedir}/lib/%{name}-binary
@@ -94,6 +95,7 @@ modules with dkms source packages installed
 %patch33 -p1 -b .zfs~
 %patch34 -p1 -b .resetdeps~
 %patch35 -p1 -b .dontfail~
+%patch36 -p1 -b .obs_mod_check~
 
 %install
 %makeinstall_std INITD=%{buildroot}%{_initrddir} \
