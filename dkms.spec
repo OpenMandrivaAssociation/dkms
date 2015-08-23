@@ -5,11 +5,12 @@ Name:		dkms
 Version:	2.2.0.3.1
 URL:		http://linux.dell.com/dkms
 %define	gitdate	20130827
-Release:	0.%{gitdate}.4
+Release:	0.%{gitdate}.5
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
 Suggests:	kernel-devel
+Suggests:	kernel-nrjQL-desktop-devel-latest
 # (tpg) these are needed before dkms.service starts
 Requires(pre):	patch
 Requires(pre):	coreutils
