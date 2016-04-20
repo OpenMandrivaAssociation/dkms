@@ -10,7 +10,6 @@ License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
 Suggests:	kernel-devel
-Suggests:	kernel-nrjQL-desktop-devel-latest
 # (tpg) these are needed before dkms.service starts
 Requires(pre):	patch
 Requires(pre):	coreutils
