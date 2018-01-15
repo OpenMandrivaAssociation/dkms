@@ -5,11 +5,12 @@ Name:		dkms
 Version:	2.2.0.3.1
 URL:		http://linux.dell.com/dkms
 %define	gitdate	20130827
-Release:	3.%{gitdate}.13
+Release:	3.%{gitdate}.14
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
 Suggests:	kernel-devel
+Requires:	kernel-release-headers
 # (tpg) these are needed before dkms.service starts
 Requires(pre):	patch
 Requires(pre):	coreutils
@@ -25,7 +26,7 @@ Requires(pre):	make
 Requires(pre):	which
 Requires(pre):	file
 Requires(pre):	kmod
-Requires(post,postun):	systemd-units
+Requires(post,postun):	systemd
 %rename		%{name}-minimal
 # unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
 Source0:	http://linux.dell.com/dkms/permalink/%{name}-%{version}.tar.xz
@@ -120,6 +121,11 @@ install -m644 -p %{SOURCE4} -D %{buildroot}%{_unitdir}/%{name}.service
 sed -i -e 's/moondrake/OpenMandriva/gI' %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.spec
 %endif
 
+install -d %{buildroot}%{_presetdir}
+cat > %{buildroot}%{_presetdir}/86-dkms.preset << EOF
+enable dkms.service
+EOF
+
 %triggerpostun -- dkms < 2.0.19-11
 rm -f /etc/rc.d/*/{K,S}??dkms
 
@@ -128,10 +134,10 @@ echo "Preinstalling packages"
 
 %post
 /bin/systemctl --quiet restart dkms.service
-/bin/systemctl --quiet try-restart fedora-loadmodules.service
 
 %files
-%doc sample.spec sample.conf AUTHORS template-dkms-mkrpm.spec 
+%doc sample.spec sample.conf AUTHORS template-dkms-mkrpm.spec
+%{_presetdir}/86-dkms.preset
 %{_unitdir}/%{name}.service
 %{_sbindir}/dkms
 %{_dkmsdir}
