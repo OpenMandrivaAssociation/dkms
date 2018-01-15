@@ -1,8 +1,10 @@
 [Unit]
 Description=Builds and install new kernel modules through DKMS
 Documentation=man:dkms(8)
-Wants=fedora-loadmodules.service
-PropagatesReloadTo=fedora-loadmodules.service
+DefaultDependencies=no
+Conflicts=shutdown.target
+Before=basic.target shutdown.target
+After=local-fs.target
 
 [Service]
 Type=oneshot
