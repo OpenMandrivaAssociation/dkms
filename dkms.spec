@@ -5,12 +5,12 @@ Name:		dkms
 Version:	2.2.0.3.1
 URL:		http://linux.dell.com/dkms
 %define	gitdate	20130827
-Release:	3.%{gitdate}.14
+Release:	3.%{gitdate}.15
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
-Suggests:	kernel-devel
-Requires:	kernel-release-headers
+Requires:	kernel-devel
+Suggests:	kernel-devel-latest
 # (tpg) these are needed before dkms.service starts
 Requires(pre):	patch
 Requires(pre):	coreutils
@@ -20,12 +20,13 @@ Requires(pre):	gawk
 Requires(pre):	grep
 Requires(pre):	findutils
 Requires(pre):	lsb-release
-Requires(pre):	gcc
+Requires(pre):	gcc >= 7.2.1_2017.11-3
 Requires(pre):	gcc-cpp
 Requires(pre):	make
 Requires(pre):	which
 Requires(pre):	file
 Requires(pre):	kmod
+Requires(pre):	pkgconfig(libelf) >= 0.170
 Requires(post,postun):	systemd
 %rename		%{name}-minimal
 # unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
@@ -117,10 +118,6 @@ mkdir -p %{buildroot}%{_dkmsbinarydir}
 install -m644 -p %{SOURCE2} -D %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
 install -m644 -p %{SOURCE4} -D %{buildroot}%{_unitdir}/%{name}.service
 
-%if "%{disttag}" == "omv"
-sed -i -e 's/moondrake/OpenMandriva/gI' %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.spec
-%endif
-
 install -d %{buildroot}%{_presetdir}
 cat > %{buildroot}%{_presetdir}/86-dkms.preset << EOF
 enable dkms.service
@@ -130,10 +127,11 @@ EOF
 rm -f /etc/rc.d/*/{K,S}??dkms
 
 %pre
-echo "Preinstalling packages"
+echo "Preinstalling packages needed for building kernel modules. Please wait... "
 
 %post
 /bin/systemctl --quiet restart dkms.service
+/bin/systemctl --quiet try-restart fedora-loadmodules.service
 
 %files
 %doc sample.spec sample.conf AUTHORS template-dkms-mkrpm.spec

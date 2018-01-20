@@ -46,7 +46,7 @@
 +	invoke_command "make $make_flags CONFIG_MODVERSIONS=1 KERNELRELEASE=$1 dep" "make $make_flags CONFIG_MODVERSIONS=1 dep" background
      elif grep -q rhconfig.h $kernel_source_dir/include/linux/{modversions,version}.h 2>/dev/null; then
   	if [ -e /etc/mandriva-release ]; then
-  	    echo $"Running Moondrake style preparation routine"
+  	    echo $"Running OpenMandriva style preparation routine"
 @@ -1178,7 +1180,7 @@ prepare_kernel()
  	    mv -f $kernel_source_dir/tmp_include_depends.new $kernel_source_dir/tmp_include_depends
  	fi

@@ -1,7 +1,7 @@
 %{?!module_name: %{error: You did not specify a module name (%%module_name)}}
 %{?!version: %{error: You did not specify a module version (%%version)}}
 %{?!kernel_versions: %{error: You did not specify kernel versions (%%kernel_version)}}
-%{?!packager: %define packager Moondrake GNU/Linux Team <http://www.moondrake.org>
+%{?!packager: %define packager OpenMandriva Association  <https://openmandriva.org>
 %{?!license: %define license Commercial}
 
 %{?!_dkmsdir: %define _dkmsdir %_localstatedir/lib/dkms}

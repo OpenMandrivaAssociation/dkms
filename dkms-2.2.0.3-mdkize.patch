@@ -55,7 +55,7 @@
      elif grep -q rhconfig.h $kernel_source_dir/include/linux/{modversions,version}.h 2>/dev/null; then
 -	echo $"Running Red Hat style preparation routine"
 + 	if [ -e /etc/mandriva-release ]; then
-+ 	    echo $"Running Moondrake style preparation routine"
++ 	    echo $"Running OpenMandriva style preparation routine"
 + 	else
 + 	    echo $"Running Red Hat style preparation routine"
 + 	fi
