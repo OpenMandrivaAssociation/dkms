@@ -1,41 +1,19 @@
 %define __noautoreq '.*/bin/awk|.*/bin/gawk'
 
+%define _dkmsdir %{_localstatedir}/lib/%{name}
+%define _dkmsbinarydir %{_localstatedir}/lib/%{name}-binary
+
 Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
-Version:	2.2.0.3.1
-URL:		http://linux.dell.com/dkms
-%define	gitdate	20130827
-Release:	3.%{gitdate}.15
+Version:	2.6.1
+Release:	1
 License:	GPLv2+
 Group:		System/Base
-BuildArch:	noarch
-Requires:	kernel-devel
-Suggests:	kernel-devel-latest
-# (tpg) these are needed before dkms.service starts
-Requires(pre):	patch
-Requires(pre):	coreutils
-Requires(pre):	cpio
-Requires(pre):	sed
-Requires(pre):	gawk
-Requires(pre):	grep
-Requires(pre):	findutils
-Requires(pre):	lsb-release
-Requires(pre):	gcc >= 7.2.1_2017.11-3
-Requires(pre):	gcc-cpp
-Requires(pre):	make
-Requires(pre):	which
-Requires(pre):	file
-Requires(pre):	kmod
-Requires(pre):	pkgconfig(libelf) >= 0.170
-Requires(post,postun):	systemd
-%rename		%{name}-minimal
-# unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
-Source0:	http://linux.dell.com/dkms/permalink/%{name}-%{version}.tar.xz
+URL:		http://linux.dell.com/dkms
+Source0:	https://github.com/dell/dkms/archive/%{name}-%{version}.tar.gz
 Source1:	dkms-mkrpm.spec.template
 Source2:	dkms.depmod.conf
 Source3:	autoload.awk
-Source4:	dkms.service
-
 Patch1:		dkms-2.0.19-norpm.patch
 Patch2:		dkms-2.2.0.3-mdkize.patch
 Patch4:		dkms-2.2.0.3-compressed-module.patch
@@ -61,9 +39,28 @@ Patch34:	dkms-reset-build-dependencies.patch
 Patch35:	dkms-2.2.0.3-dont_fail_if_module_source_removed.patch
 Patch36:	dkms-2.2.0.3-fix_obsolete_modules_check.patch
 Patch37:	dkms-2.2.0.3-parallel_fix.patch
-
-%define _dkmsdir %{_localstatedir}/lib/%{name}
-%define _dkmsbinarydir %{_localstatedir}/lib/%{name}-binary
+BuildArch:	noarch
+Requires:	kernel-devel
+Suggests:	kernel-devel-latest
+# (tpg) these are needed before dkms.service starts
+Requires(pre):	patch
+Requires(pre):	coreutils
+Requires(pre):	cpio
+Requires(pre):	sed
+Requires(pre):	gawk
+Requires(pre):	grep
+Requires(pre):	findutils
+Requires(pre):	lsb-release
+Requires(pre):	gcc >= 7.2.1_2017.11-3
+Requires(pre):	gcc-cpp
+Requires(pre):	make
+Requires(pre):	which
+Requires(pre):	file
+Requires(pre):	kmod
+Requires(pre):	pkgconfig(libelf) >= 0.170
+Requires(pre):	rpm-helper
+Requires(post,postun): systemd
+%rename		%{name}-minimal
 
 %description
 This package contains the framework for the Dynamic
@@ -116,7 +113,6 @@ rm %{buildroot}%{_prefix}/lib/%{name}/dkms_autoinstaller
 install -m755 -p %{SOURCE3} %{buildroot}%{_sbindir}/dkms_autoload
 mkdir -p %{buildroot}%{_dkmsbinarydir}
 install -m644 -p %{SOURCE2} -D %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
-install -m644 -p %{SOURCE4} -D %{buildroot}%{_unitdir}/%{name}.service
 
 install -d %{buildroot}%{_presetdir}
 cat > %{buildroot}%{_presetdir}/86-dkms.preset << EOF
@@ -127,7 +123,7 @@ EOF
 rm -f /etc/rc.d/*/{K,S}??dkms
 
 %pre
-echo "Preinstalling packages needed for building kernel modules. Please wait... "
+printf '%s\n' "Preinstalling packages needed for building kernel modules. Please wait... "
 
 %post
 /bin/systemctl --quiet restart dkms.service
