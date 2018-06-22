@@ -14,31 +14,8 @@ Source0:	https://github.com/dell/dkms/archive/%{name}-%{version}.tar.gz
 Source1:	dkms-mkrpm.spec.template
 Source2:	dkms.depmod.conf
 Source3:	autoload.awk
-Patch1:		dkms-2.0.19-norpm.patch
-Patch2:		dkms-2.2.0.3-mdkize.patch
-Patch4:		dkms-2.2.0.3-compressed-module.patch
-Patch7:		dkms-2.2.0.3-procconfig.patch
-Patch8:		dkms-2.2.0.3-mdkrpm-split-ver-rel.patch
-Patch10:	dkms-2.2.0.3-binary_only.patch
-Patch11:	dkms-2.2.0.3-min-max-kernel.patch
-Patch17:	dkms-2.2.0.3-autoalias.patch
-Patch18:	dkms-2.2.0.3-mkrpm_status.patch
-Patch21:	dkms-2.2.0.3-init-mdv-interactive.patch
-Patch22:	dkms-2.2.0.3-symvers.patch
-Patch24:	dkms-2.2.0.3-generic-preparation-for-2.6.39-and-higher.patch
-Patch25:	dkms-2.2.0.3-suggest-devel-not-source.patch
-Patch26:	dkms-2.2.0.3.1-xz-support.patch
-Patch27:	dkms-2.2.0.3-parallel-build.patch
-Patch28:	dkms-man.patch
-Patch29:	dkms-cleanup-after-removal.patch
-Patch30:	dkms-do-not-fail-on-modules-dir.patch
-Patch31:	dkms-use-STRIP-0-as-the-default-for-the-STRIP-array.patch
-Patch32:	dkms-2.2.0.3.1-add-dependency-logic-for-automatic-builds.patch
-Patch33:	dkms-fix-zfs-autoinstall-failures-for-kernel-upgrades.patch
-Patch34:	dkms-reset-build-dependencies.patch
-Patch35:	dkms-2.2.0.3-dont_fail_if_module_source_removed.patch
-Patch36:	dkms-2.2.0.3-fix_obsolete_modules_check.patch
-Patch37:	dkms-2.2.0.3-parallel_fix.patch
+BuildRequires:	systemd
+BuildRequires:	rpm-helper
 BuildArch:	noarch
 Requires:	kernel-devel
 Suggests:	kernel-devel-latest
@@ -73,30 +50,7 @@ modules with dkms source packages installed
 
 %prep
 %setup -q
-%patch2 -p1 -b .mdkize~
-%patch4 -p1 -b .compressed-module~
-%patch7 -p1 -b .procconfig~
-%patch8 -p1 -b .mdkrpm-split-ver-rel~
-%patch10 -p1 -b .binary_only~
-%patch11 -p1 -b .min-max-kernel~
-%patch17 -p1 -b .autoalias~
-%patch18 -p1 -b .mkrpm~
-%patch21 -p1 -b .mdv-interactive~
-%patch22 -p1 -b .symvers~
-%patch24 -p1 -b .generic-prepare~
-%patch25 -p1 -b .suggests-devel~
-%patch26 -p1 -b .xz_support~
-%patch27 -p1 -b .parallel~
-%patch28 -p1 -b .man~
-%patch29 -p1 -b .cleanup~
-%patch30 -p1 -b .nofail~
-%patch31 -p1 -b .strip0~
-%patch32 -p1 -b .autodeplogic~
-%patch33 -p1 -b .zfs~
-%patch34 -p1 -b .resetdeps~
-%patch35 -p1 -b .dontfail~
-%patch36 -p1 -b .obs_mod_check~
-%patch37 -p1 -b .parallel_fix~
+%autopatch -p1
 
 %install
 %makeinstall_std INITD=%{buildroot}%{_initrddir} \
@@ -114,6 +68,7 @@ install -m755 -p %{SOURCE3} %{buildroot}%{_sbindir}/dkms_autoload
 mkdir -p %{buildroot}%{_dkmsbinarydir}
 install -m644 -p %{SOURCE2} -D %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
 
+install -m644 -p dkms.service -D %{buildroot}%{_systemunitdir}/dkms.service
 install -d %{buildroot}%{_presetdir}
 cat > %{buildroot}%{_presetdir}/86-dkms.preset << EOF
 enable dkms.service
@@ -132,7 +87,7 @@ printf '%s\n' "Preinstalling packages needed for building kernel modules. Please
 %files
 %doc sample.spec sample.conf AUTHORS template-dkms-mkrpm.spec
 %{_presetdir}/86-dkms.preset
-%{_unitdir}/%{name}.service
+%{_systemunitdir}/%{name}.service
 %{_sbindir}/dkms
 %{_dkmsdir}
 %dir %{_dkmsbinarydir}
