@@ -4,7 +4,7 @@ Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
 Version:	2.6.1
 URL:		https://github.com/dell/dkms
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
@@ -63,7 +63,7 @@ This package is intended for building binary kernel
 modules with dkms source packages installed
 
 %prep
-%setup -q v%{version}.tar.gz
+%setup -q 
 %patch2 -p1 -b .mdkize~
 %patch7 -p1 -b .procconfig~
 %patch8 -p1 -b .mdkrpm-split-ver-rel~
