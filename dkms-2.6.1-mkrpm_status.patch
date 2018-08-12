@@ -1,0 +1,17 @@
+--- dkms-2.6.1/dkms	2018-08-10 17:07:58.879068089 +0100
++++ dkms-2.6.1/dkms.mkrpm~	2018-08-10 17:17:08.685848588 +0100
+@@ -2975,10 +2975,13 @@
+         echo $"DKMS: mkrpm completed."
+     else
+         cat ${temp_dir_name}/rpmbuild.log >&2
+-        die 7 $"There was a problem creating your rpm."
++	RC=7        
+     fi
+     rm -rf $temp_dir_name
++    trap - EXIT HUP TERM > /dev/null 2>&1
+     trap > /dev/null 2>&1
++    [ ${RC} -ne 0 ] && exit ${RC}
++    true
+ }
+ 
+ preproc_file()

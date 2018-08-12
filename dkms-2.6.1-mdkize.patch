@@ -1,0 +1,81 @@
+--- dkms-2.6.1/dkms	2018-04-25 16:56:48.000000000 +0100
++++ dkms-2.6.1/dkms.mdkize~	2018-08-10 14:39:08.097290692 +0100
+@@ -925,6 +925,16 @@
+     done
+     done
+ 
++    if [ -d /etc/modprobe.d ]; then
++	local index=0
++	while [ $index -lt ${#dest_module_name[@]} ]; do
++	    if [ "${modules_conf_extract_aliases[$index]}" = yes -a -f $install_tree/${kernelver_array[0]}${dest_module_location[$index]}/${dest_module_name[$index]}$module_suffix ]; then
++		modinfo $install_tree/${kernelver_array[0]}${dest_module_location[$index]}/${dest_module_name[$index]}$module_suffix | sed -n -e "s/alias:\(.*\)$/alias \1 ${dest_module_name[$index]}/p" > /etc/modprobe.d/dkms-aliases-${dest_module_name[$index]}
++	    fi
++	    index=$(($index+1))
++	done
++    fi
++
+     # Delete the temp dir
+     rm -rf $temp_dir_name
+ }
+@@ -1137,6 +1147,7 @@
+     if [[ (! ( $(VER $1) < $(VER 2.6.5) ) || -d /etc/SuSEconfig) && \
+         -d "$kernel_source_dir" && \
+         -z "$ksourcedir_fromcli" ]]; then
++        ! -L "$kernel_source_dir" && \
+         echo $""
+         echo $"Kernel preparation unnecessary for this kernel.  Skipping..."
+         no_clean_kernel="no-clean-kernel"
+@@ -1154,7 +1165,22 @@
+     }
+ 
+     # Set kernel_config
+-    if [[ -e /etc/redhat-release || -e /etc/fedora-release ]]; then
++    if [ -e /etc/mandriva-release ]; then
++	if [ -z "$kernel_config" ] && [ -d "$kernel_source_dir/arch" ]; then
++	    local kernel_trunc=`echo $1 | sed 's/-.*//'`
++            if [ "$2" == "i586" ] || [ "$2" == "i686" ]; then
++                config_arch="i386"
++            else
++                config_arch=$2
++            fi
++	    for config_type in BOOT smp enterprise secure i586-up-1GB i686-up-4GB p3-smp-64GB desktop586 desktop laptop server; do
++		[ `echo "$1" | grep "$config_type"` ] && kernel_config="$kernel_source_dir/arch/$config_arch/defconfig-$config_type"
++		[ ! -e "$kernel_config" ] && kernel_config=""
++	    done
++	    [ -z "$kernel_config" ] && kernel_config="$kernel_source_dir/arch/$config_arch/defconfig"
++	    [ ! -e "$kernel_config" ] && kernel_config=""
++	fi
++    elif [ -e /etc/redhat-release ] || [ -e /etc/fedora-release ]; then
+     # Note this also applies to VMware 3.x
+     if [[ -z $kernel_config && -d $kernel_source_dir/configs ]]; then
+         local kernel_trunc=${1%%-*}
+@@ -1198,7 +1224,11 @@
+         invoke_command "make KERNELRELEASE=$1 cloneconfig" "make cloneconfig" background
+         invoke_command "make -j$parallel_jobs CONFIG_MODVERSIONS=1 KERNELRELEASE=$1 dep" "make CONFIG_MODVERSIONS=1 dep" background
+     elif grep -q rhconfig.h $kernel_source_dir/include/linux/{modversions,version}.h 2>/dev/null; then
+-        echo $"Running Red Hat style preparation routine"
++ 	if [ -e /etc/mandriva-release ]; then
++ 	    echo $"Running OpenMandriva style preparation routine"
++ 	else
++ 	    echo $"Running Red Hat style preparation routine"
++ 	fi        
+         invoke_command "make clean" "make clean" background
+         [[ $config_contents ]] && echo "$config_contents" > .config
+ 
+@@ -1244,7 +1274,7 @@
+         if [[ $(VER $1) < $(VER 2.5) ]]; then
+             invoke_command "make -j$parallel_jobs KERNELRELEASE=$1 dep" "make dep" background
+         else
+-            invoke_command "make -j$parallel_jobs KERNELRELEASE=$1 prepare-all scripts" "make prepare-all" background
++            invoke_command "make -j$parallel_jobs KERNELRELEASE=$1 prepare scripts" "make prepare" background
+         fi
+     fi
+     cd - >/dev/null
+@@ -3553,6 +3583,7 @@
+ binaries_only=""
+ source_only=""
+ all=""
++binary=""
+ module_suffix=""
+ module_uncompressed_suffix=""
+ module_compressed_suffix=""

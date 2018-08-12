@@ -1,0 +1,13 @@
+--- dkms-2.6.1/dkms	2018-08-12 14:32:17.778872796 +0100
++++ dkms-2.6.1/dkms.dontfail~	2018-08-12 15:27:19.440297076 +0100
+@@ -549,6 +549,9 @@
+     [[ $conf ]] && read_conf_file="$conf"
+     [[ $3 ]] && read_conf_file="$3"
+ 
++    [[ ! -r $read_conf_file && -r $dkms_tree/$module/$module_version/build/dkms.conf ]] && \
++	read_conf_file="$dkms_tree/$module/$module_version/build/dkms.conf"
++
+     [[ -r $read_conf_file ]] || die 4 $"Could not locate dkms.conf file." \
+     $"File: $read_conf_file does not exist."
+ 
+ 
