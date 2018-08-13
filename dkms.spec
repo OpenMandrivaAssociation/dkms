@@ -4,7 +4,7 @@ Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
 Version:	2.6.1
 URL:		https://github.com/dell/dkms
-Release:	2
+Release:	3
 License:	GPLv2+
 Group:		System/Base
 BuildArch:	noarch
