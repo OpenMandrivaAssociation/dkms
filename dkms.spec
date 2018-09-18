@@ -1,3 +1,5 @@
+%define _dkmsdir %{_localstatedir}/lib/%{name}
+%define _dkmsbinarydir %{_localstatedir}/lib/%{name}-binary
 %define __noautoreq '.*/bin/awk|.*/bin/gawk'
 
 Summary:	Dynamic Kernel Module Support Framework
@@ -7,6 +9,29 @@ URL:		https://github.com/dell/dkms
 Release:	3
 License:	GPLv2+
 Group:		System/Base
+# unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
+Source0:	https://github.com/dell/dkms/archive/v%{version}.tar.gz
+Source1:	dkms-mkrpm.spec.template
+Source2:	dkms.depmod.conf
+Source3:	autoload.awk
+Source4:	dkms.service
+
+#Patch1:		dkms-2.0.19-norpm.patch
+Patch2:		dkms-2.6.1-mdkize.patch
+Patch7:		dkms-2.6.1-procconfig.patch
+Patch8:		dkms-2.6.1-mdkrpm-split-ver-rel.patch
+Patch10:	dkms-2.6.1-binary_only.patch
+Patch11:	dkms-2.6.1-min-max-kernel.patch
+Patch17:	dkms-2.6.1-autoalias.patch
+Patch18:	dkms-2.6.1-mkrpm_status.patch
+Patch22:	dkms-2.6.1-symvers.patch
+Patch24:	dkms-2.6.1-generic-preparation-for-2.6.39-and-higher.patch
+Patch25:	dkms-2.6.1-suggest-devel-not-source.patch
+Patch29:	dkms-cleanup-after-removal.patch
+Patch35:	dkms-2.6.1-dont_fail_if_module_source_removed.patch
+Patch37:	dkms-2.6.1-parallel_fix.patch
+
+BuildRequires:	systemd-macros
 BuildArch:	noarch
 Requires:	kernel-devel
 Suggests:	kernel-devel-latest
@@ -28,30 +53,6 @@ Requires(pre):	kmod
 Requires(pre):	pkgconfig(libelf) >= 0.170
 Requires(post,postun):	systemd
 %rename		%{name}-minimal
-# unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
-Source0:	https://github.com/dell/dkms/archive/v%{version}.tar.gz
-Source1:	dkms-mkrpm.spec.template
-Source2:	dkms.depmod.conf
-Source3:	autoload.awk
-Source4:	dkms.service
-
-Patch1:		dkms-2.0.19-norpm.patch
-Patch2:		dkms-2.6.1-mdkize.patch
-Patch7:		dkms-2.6.1-procconfig.patch
-Patch8:		dkms-2.6.1-mdkrpm-split-ver-rel.patch
-Patch10:	dkms-2.6.1-binary_only.patch
-Patch11:	dkms-2.6.1-min-max-kernel.patch
-Patch17:	dkms-2.6.1-autoalias.patch
-Patch18:	dkms-2.6.1-mkrpm_status.patch
-Patch22:	dkms-2.6.1-symvers.patch
-Patch24:	dkms-2.6.1-generic-preparation-for-2.6.39-and-higher.patch
-Patch25:	dkms-2.6.1-suggest-devel-not-source.patch
-Patch29:	dkms-cleanup-after-removal.patch
-Patch35:	dkms-2.6.1-dont_fail_if_module_source_removed.patch
-Patch37:	dkms-2.6.1-parallel_fix.patch
-
-%define _dkmsdir %{_localstatedir}/lib/%{name}
-%define _dkmsbinarydir %{_localstatedir}/lib/%{name}-binary
 
 %description
 This package contains the framework for the Dynamic
@@ -63,7 +64,7 @@ This package is intended for building binary kernel
 modules with dkms source packages installed
 
 %prep
-%setup -q 
+%autosetup -p1 
 %patch2 -p1 -b .mdkize~
 %patch7 -p1 -b .procconfig~
 %patch8 -p1 -b .mdkrpm-split-ver-rel~
