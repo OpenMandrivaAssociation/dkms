@@ -1,21 +1,37 @@
-%define __noautoreq '.*/bin/awk|.*/bin/gawk'
-
 %define _dkmsdir %{_localstatedir}/lib/%{name}
 %define _dkmsbinarydir %{_localstatedir}/lib/%{name}-binary
+%define __noautoreq '.*/bin/awk|.*/bin/gawk'
 
 Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
 Version:	2.6.1
-Release:	2
+URL:		https://github.com/dell/dkms
+Release:	3
 License:	GPLv2+
 Group:		System/Base
-URL:		http://linux.dell.com/dkms
-Source0:	https://github.com/dell/dkms/archive/%{name}-%{version}.tar.gz
+# unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
+Source0:	https://github.com/dell/dkms/archive/v%{version}.tar.gz
 Source1:	dkms-mkrpm.spec.template
 Source2:	dkms.depmod.conf
 Source3:	autoload.awk
-BuildRequires:	systemd
-BuildRequires:	rpm-helper
+Source4:	dkms.service
+
+#Patch1:		dkms-2.0.19-norpm.patch
+Patch2:		dkms-2.6.1-mdkize.patch
+Patch7:		dkms-2.6.1-procconfig.patch
+Patch8:		dkms-2.6.1-mdkrpm-split-ver-rel.patch
+Patch10:	dkms-2.6.1-binary_only.patch
+Patch11:	dkms-2.6.1-min-max-kernel.patch
+Patch17:	dkms-2.6.1-autoalias.patch
+Patch18:	dkms-2.6.1-mkrpm_status.patch
+Patch22:	dkms-2.6.1-symvers.patch
+Patch24:	dkms-2.6.1-generic-preparation-for-2.6.39-and-higher.patch
+Patch25:	dkms-2.6.1-suggest-devel-not-source.patch
+Patch29:	dkms-cleanup-after-removal.patch
+Patch35:	dkms-2.6.1-dont_fail_if_module_source_removed.patch
+Patch37:	dkms-2.6.1-parallel_fix.patch
+
+BuildRequires:	systemd-macros
 BuildArch:	noarch
 Requires:	kernel-devel
 Suggests:	kernel-devel-latest
@@ -35,8 +51,7 @@ Requires(pre):	which
 Requires(pre):	file
 Requires(pre):	kmod
 Requires(pre):	pkgconfig(libelf) >= 0.170
-Requires(pre):	rpm-helper
-Requires(post,postun): systemd
+Requires(post,postun):	systemd
 %rename		%{name}-minimal
 
 %description
@@ -49,8 +64,20 @@ This package is intended for building binary kernel
 modules with dkms source packages installed
 
 %prep
-%setup -q
-%autopatch -p1
+%autosetup -p1 
+%patch2 -p1 -b .mdkize~
+%patch7 -p1 -b .procconfig~
+%patch8 -p1 -b .mdkrpm-split-ver-rel~
+%patch10 -p1 -b .binary_only~
+%patch11 -p1 -b .min-max-kernel~
+%patch17 -p1 -b .autoalias~
+%patch18 -p1 -b .mkrpm~
+%patch22 -p1 -b .symvers~
+%patch24 -p1 -b .generic-prepare~
+%patch25 -p1 -b .suggests-devel~
+%patch29 -p1 -b .cleanup~
+%patch35 -p1 -b .dontfail~
+%patch37 -p1 -b .parallel_fix~
 
 %install
 %makeinstall_std INITD=%{buildroot}%{_initrddir} \
@@ -67,8 +94,8 @@ rm %{buildroot}%{_prefix}/lib/%{name}/dkms_autoinstaller
 install -m755 -p %{SOURCE3} %{buildroot}%{_sbindir}/dkms_autoload
 mkdir -p %{buildroot}%{_dkmsbinarydir}
 install -m644 -p %{SOURCE2} -D %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
+install -m644 -p %{SOURCE4} -D %{buildroot}%{_unitdir}/%{name}.service
 
-install -m644 -p dkms.service -D %{buildroot}%{_systemunitdir}/dkms.service
 install -d %{buildroot}%{_presetdir}
 cat > %{buildroot}%{_presetdir}/86-dkms.preset << EOF
 enable dkms.service
@@ -78,7 +105,7 @@ EOF
 rm -f /etc/rc.d/*/{K,S}??dkms
 
 %pre
-printf '%s\n' "Preinstalling packages needed for building kernel modules. Please wait... "
+echo "Preinstalling packages needed for building kernel modules. Please wait... "
 
 %post
 /bin/systemctl --quiet restart dkms.service
@@ -87,7 +114,7 @@ printf '%s\n' "Preinstalling packages needed for building kernel modules. Please
 %files
 %doc sample.spec sample.conf AUTHORS template-dkms-mkrpm.spec
 %{_presetdir}/86-dkms.preset
-%{_systemunitdir}/%{name}.service
+%{_unitdir}/%{name}.service
 %{_sbindir}/dkms
 %{_dkmsdir}
 %dir %{_dkmsbinarydir}

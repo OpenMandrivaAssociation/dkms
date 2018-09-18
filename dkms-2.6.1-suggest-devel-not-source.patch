@@ -1,0 +1,11 @@
+--- dkms-2.6.1/dkms	2018-08-10 20:43:19.267491524 +0100
++++ /home/colin/Development/dkms/BUILD/dkms-2.6.1/dkms.suggests-devel~	2018-08-10 20:47:43.846947358 +0100
+@@ -1147,7 +1147,7 @@
+ 
+     set_kernel_source_dir "$1"
+ 
+-    # Check that kernel-source exists
++    # Check that kernel-devel exists
+     _check_kernel_dir "$1" || {
+     case "$running_distribution" in
+         Debian* | Ubuntu* )
