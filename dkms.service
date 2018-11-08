@@ -12,4 +12,4 @@ RemainAfterExit=true
 ExecStart=/bin/sh -c 'dkms autoinstall --verbose --kernelver $(uname -r)'
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=basic.target
