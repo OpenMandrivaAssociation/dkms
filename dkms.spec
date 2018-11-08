@@ -1,6 +1,6 @@
 %define _dkmsdir %{_localstatedir}/lib/%{name}
 %define _dkmsbinarydir %{_localstatedir}/lib/%{name}-binary
-%define __noautoreq '.*/bin/awk|.*/bin/gawk'
+%global __requires_exclude /bin/awk
 
 Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
@@ -65,22 +65,11 @@ modules with dkms source packages installed
 
 %prep
 %autosetup -p1 
-%patch2 -p1 -b .mdkize~
-%patch7 -p1 -b .procconfig~
-%patch8 -p1 -b .mdkrpm-split-ver-rel~
-%patch10 -p1 -b .binary_only~
-%patch11 -p1 -b .min-max-kernel~
-%patch17 -p1 -b .autoalias~
-%patch18 -p1 -b .mkrpm~
-%patch22 -p1 -b .symvers~
-%patch24 -p1 -b .generic-prepare~
-%patch25 -p1 -b .suggests-devel~
-%patch29 -p1 -b .cleanup~
-%patch35 -p1 -b .dontfail~
-%patch37 -p1 -b .parallel_fix~
+
+%build
 
 %install
-%makeinstall_std INITD=%{buildroot}%{_initrddir} \
+%make_install INITD=%{buildroot}%{_initrddir} \
 		 SBIN=%{buildroot}%{_sbindir} \
 		 VAR=%{buildroot}%{_localstatedir}/lib/%{name} \
 		 MAN=%{buildroot}%{_mandir}/man8 \
@@ -101,11 +90,8 @@ cat > %{buildroot}%{_presetdir}/86-dkms.preset << EOF
 enable dkms.service
 EOF
 
-%triggerpostun -- dkms < 2.0.19-11
-rm -f /etc/rc.d/*/{K,S}??dkms
-
 %pre
-echo "Preinstalling packages needed for building kernel modules. Please wait... "
+printf '%s\n' "Preinstalling packages needed for building kernel modules. Please wait... "
 
 %post
 /bin/systemctl --quiet restart dkms.service
