@@ -6,7 +6,7 @@ Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
 Version:	2.6.1
 URL:		https://github.com/dell/dkms
-Release:	5
+Release:	
 License:	GPLv2+
 Group:		System/Base
 # unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
@@ -95,7 +95,7 @@ printf '%s\n' "Preinstalling packages needed for building kernel modules. Please
 
 %post
 /bin/systemctl --quiet restart dkms.service
-/bin/systemctl --quiet try-restart fedora-loadmodules.service
+/bin/systemctl --quiet try-restart loadmodules.service
 
 %files
 %doc sample.spec sample.conf AUTHORS template-dkms-mkrpm.spec
