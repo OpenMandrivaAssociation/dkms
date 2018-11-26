@@ -51,7 +51,8 @@ Requires(pre):	which
 Requires(pre):	file
 Requires(pre):	kmod
 Requires(pre):	pkgconfig(libelf) >= 0.170
-Requires(post,postun):	systemd
+Requires(pre,post):	systemd
+Requires(pre,post):	initscripts >= 10.01-4
 %rename		%{name}-minimal
 
 %description
