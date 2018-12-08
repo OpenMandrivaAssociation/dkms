@@ -6,14 +6,13 @@ Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
 Version:	2.6.1
 URL:		https://github.com/dell/dkms
-Release:	6
+Release:	7
 License:	GPLv2+
 Group:		System/Base
 # unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
 Source0:	https://github.com/dell/dkms/archive/v%{version}.tar.gz
 Source1:	dkms-mkrpm.spec.template
 Source2:	dkms.depmod.conf
-Source3:	autoload.awk
 Source4:	dkms.service
 
 #Patch1:		dkms-2.0.19-norpm.patch
@@ -30,6 +29,7 @@ Patch25:	dkms-2.6.1-suggest-devel-not-source.patch
 Patch29:	dkms-cleanup-after-removal.patch
 Patch35:	dkms-2.6.1-dont_fail_if_module_source_removed.patch
 Patch37:	dkms-2.6.1-parallel_fix.patch
+Patch38:	dkms-2.6.1-display_plymouth_message.patch
 
 BuildRequires:	systemd-macros
 BuildArch:	noarch
@@ -65,7 +65,7 @@ This package is intended for building binary kernel
 modules with dkms source packages installed
 
 %prep
-%autosetup -p1 
+%autosetup -p1
 
 %build
 
@@ -81,7 +81,6 @@ modules with dkms source packages installed
 install -m644 -p %{SOURCE1} -D %{buildroot}%{_sysconfdir}/%{name}/template-dkms-mkrpm.spec
 install -m755 -p dkms_mkkerneldoth -D %{buildroot}%{_sbindir}/dkms_mkkerneldoth
 rm %{buildroot}%{_prefix}/lib/%{name}/dkms_autoinstaller
-install -m755 -p %{SOURCE3} %{buildroot}%{_sbindir}/dkms_autoload
 mkdir -p %{buildroot}%{_dkmsbinarydir}
 install -m644 -p %{SOURCE2} -D %{buildroot}%{_sysconfdir}/depmod.d/%{name}.conf
 install -m644 -p %{SOURCE4} -D %{buildroot}%{_unitdir}/%{name}.service
@@ -97,6 +96,7 @@ printf '%s\n' "Preinstalling packages needed for building kernel modules. Please
 %post
 /bin/systemctl --quiet restart dkms.service
 /bin/systemctl --quiet try-restart loadmodules.service
+/bin/systemctl --quiet try-restart systemd-modules-load.service
 
 %files
 %doc sample.spec sample.conf AUTHORS template-dkms-mkrpm.spec
@@ -106,7 +106,6 @@ printf '%s\n' "Preinstalling packages needed for building kernel modules. Please
 %{_dkmsdir}
 %dir %{_dkmsbinarydir}
 %{_sbindir}/dkms_mkkerneldoth
-%{_sbindir}/dkms_autoload
 %{_mandir}/man8/dkms.8*
 %config(noreplace) %{_sysconfdir}/dkms
 # these dirs are for plugins - owned by other packages

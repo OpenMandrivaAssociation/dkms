@@ -1,0 +1,37 @@
+diff -Naur dkms-2.6.1/dkms dkms-2.6.1.tpg/dkms
+--- dkms-2.6.1/dkms	2018-12-08 17:18:42.266931000 +0000
++++ dkms-2.6.1.tpg/dkms	2018-12-08 17:44:56.689909961 +0000
+@@ -1456,6 +1456,13 @@
+     rm -rf "$dkms_tree/$module/$module_version/build"
+ }
+ 
++display_plymouth_message()
++{
++    if [ -x /bin/plymouth ] && /bin/plymouth --ping; then
++	/bin/plymouth display-message --text="$1"
++    fi
++}
++
+ build_module()
+ {
+     prepare_build
+@@ -1722,7 +1729,9 @@
+         echo $"Module $1/$2 already built for kernel $3/4"
+         return 0
+     }
++    display_plymouth_message "Building $module driver. This may take some time..."
+     module="$1" module_version="$2" kernelver="$3" arch="$4" build_module
++    display_plymouth_message ""
+ )
+ 
+ maybe_install_module() (
+@@ -1730,7 +1739,9 @@
+         echo $"Module $1/$2 already installed on kernel $3/$4"
+         return 0
+     }
++    display_plymouth_message "Installing $module driver..."
+     module="$1" module_version="$2" kernelver="$3" arch="$4" install_module
++    display_plymouth_message ""
+ )
+ 
+ build_modules() {
