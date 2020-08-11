@@ -4,9 +4,9 @@
 
 Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
-Version:	2.6.1
+Version:	2.8.3
 URL:		https://github.com/dell/dkms
-Release:	7
+Release:	1
 License:	GPLv2+
 Group:		System/Base
 # unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
@@ -26,7 +26,6 @@ Patch18:	dkms-2.6.1-mkrpm_status.patch
 Patch22:	dkms-2.6.1-symvers.patch
 Patch24:	dkms-2.6.1-generic-preparation-for-2.6.39-and-higher.patch
 Patch25:	dkms-2.6.1-suggest-devel-not-source.patch
-Patch29:	dkms-cleanup-after-removal.patch
 Patch35:	dkms-2.6.1-dont_fail_if_module_source_removed.patch
 Patch37:	dkms-2.6.1-parallel_fix.patch
 Patch38:	dkms-2.6.1-display_plymouth_message.patch
@@ -52,7 +51,6 @@ Requires(pre):	file
 Requires(pre):	kmod
 Requires(pre):	pkgconfig(libelf) >= 0.170
 Requires(pre,post):	systemd
-Requires(pre,post):	initscripts >= 10.01-4
 %rename		%{name}-minimal
 
 %description

@@ -1,6 +1,7 @@
---- dkms-2.6.1/dkms	2018-08-10 20:13:48.188066453 +0100
-+++ dkms-2.6.1/dkms.symvers~	2018-08-10 20:22:13.950487577 +0100
-@@ -1380,6 +1380,11 @@
+diff -up dkms-2.8.3/dkms.8~ dkms-2.8.3/dkms
+--- dkms-2.8.3/dkms.8~	2020-08-11 21:52:17.348515537 +0200
++++ dkms-2.8.3/dkms	2020-08-11 21:53:09.365169196 +0200
+@@ -1412,6 +1412,11 @@ do_build()
      echo $"Building module:"
  
      invoke_command "$clean" "cleaning build area" background
@@ -12,11 +13,11 @@
      echo $"DKMS make.log for $module-$module_version for kernel $kernelver ($arch)" >> "$dkms_tree/$module/$module_version/build/make.log"
      date >> "$dkms_tree/$module/$module_version/build/make.log"
      local the_make_command="${make_command/#make/make -j$parallel_jobs KERNELRELEASE=$kernelver}"
-@@ -1405,6 +1410,7 @@
+@@ -1437,6 +1442,7 @@ do_build()
  
      # Save a copy of the new module
      mkdir "$base_dir/module" >/dev/null
 +    echo -n | gzip -c > "$dkms_tree/$module/$module_version/${kernelver_array[0]}/${arch_array[0]}/module/symvers.gz"
      for ((count=0; count < ${#built_module_name[@]}; count++)); do
-     [[ ${strip[$count]} != no ]] && strip -g "$dkms_tree/$module/$module_version/build/${built_module_location[$count]}${built_module_name[$count]}$module_uncompressed_suffix"
-     if [ "$module_compressed_suffix" = ".gz" ]; then
+         [[ ${strip[$count]} != no ]] && strip -g "$dkms_tree/$module/$module_version/build/${built_module_location[$count]}${built_module_name[$count]}$module_uncompressed_suffix"
+ 
