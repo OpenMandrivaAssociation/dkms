@@ -29,6 +29,7 @@ Patch25:	dkms-2.6.1-suggest-devel-not-source.patch
 Patch35:	dkms-2.6.1-dont_fail_if_module_source_removed.patch
 Patch37:	dkms-2.6.1-parallel_fix.patch
 Patch38:	dkms-2.6.1-display_plymouth_message.patch
+Patch39:	dkms-2.8.4-fix-locate-bin-bash-openmandriva.patch
 
 BuildRequires:	systemd-macros
 BuildArch:	noarch
