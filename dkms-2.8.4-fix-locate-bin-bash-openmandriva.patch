@@ -1,0 +1,9 @@
+diff -uraN dkms-2.8.4/kernel_install.d_dkms omv-dkms-2.8.4/kernel_install.d_dkms
+--- dkms-2.8.4/kernel_install.d_dkms	2020-11-30 09:47:47.000000000 +0100
++++ omv-dkms-2.8.4/kernel_install.d_dkms	2020-12-06 17:35:15.142288837 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/bash
++#!/bin/bash
+ 
+ if [[ "$1" == "add" ]]; then
+ 	/etc/kernel/postinst.d/dkms $2
