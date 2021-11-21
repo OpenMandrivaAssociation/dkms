@@ -10,7 +10,7 @@ Release:	1
 License:	GPLv2+
 Group:		System/Base
 # unofficial version, git rev a62d38d49148871c6b17636f31c93f986d31c914
-Source0:	https://github.com/dell/dkms/archive/v%{version}.tar.gz
+Source0:	https://github.com/dell/dkms/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:	dkms-mkrpm.spec.template
 Source2:	dkms.depmod.conf
 Source4:	dkms.service
