@@ -4,7 +4,7 @@
 
 Summary:	Dynamic Kernel Module Support Framework
 Name:		dkms
-Version:	3.1.4
+Version:	3.4.0
 URL:		https://github.com/dell/dkms
 Release:	1
 License:	GPLv2+
@@ -30,6 +30,7 @@ Source4:	dkms.service
 #Patch38:	dkms-2.6.1-display_plymouth_message.patch
 #Patch39:	dkms-2.8.4-fix-locate-bin-bash-openmandriva.patch
 
+BuildRequires:  make
 BuildRequires:	systemd-macros
 BuildArch:	noarch
 Requires:	kernel-devel
